@@ -1,0 +1,47 @@
+# --- Secrets / configuration (NEVER commit) ---
+.env
+.env.local
+*.token
+*.key
+*.pem
+service-account*.json
+gcp-credentials*.json
+
+# --- Pipeline outputs (data, not source) ---
+outputs/
+*.executed.ipynb
+usdt_funnel_candidates.csv
+
+# --- Python build artifacts ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# --- Virtualenvs ---
+venv/
+env/
+.venv/
+ENV/
+
+# --- Notebook scratch ---
+.ipynb_checkpoints/
+.jupyter/
+
+# --- Editor / OS ---
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# --- Local-only ---
+patch_and_run.py
+_genericize_notebook.py
+.claude/
