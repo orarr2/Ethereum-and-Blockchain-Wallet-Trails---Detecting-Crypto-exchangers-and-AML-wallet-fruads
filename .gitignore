@@ -44,4 +44,3 @@ Thumbs.db
 # --- Local-only ---
 patch_and_run.py
 _genericize_notebook.py
-.claude/
