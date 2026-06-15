@@ -1,7 +1,7 @@
 # Core data / BigQuery
 google-cloud-bigquery>=3.25.0
-google-cloud-bigquery-storage>=2.25.0
-db-dtypes>=1.2.0
+google-cloud-bigquery-storage>=2.25.0   # fast Arrow-based downloads of query results
+db-dtypes>=1.2.0                         # lets BigQuery return NUMERIC/DATE as pandas dtypes
 pandas>=2.2.0
 numpy>=1.26.0
 
@@ -9,10 +9,9 @@ numpy>=1.26.0
 scikit-learn>=1.5.0
 
 # Graph analytics (Layer 2/3)
-# Note: networkx>=3.3 requires Python 3.10+. If on Python 3.9, pin to <3.3.
-networkx>=3.2
+networkx>=3.3
 
-# ENS reverse-resolution (no BigQuery dependency)
+# ENS reverse-resolution + Chainalysis sanctions oracle (on-chain)
 web3>=6.0.0
 
 # Visualisation / dashboard (Layer 4)
