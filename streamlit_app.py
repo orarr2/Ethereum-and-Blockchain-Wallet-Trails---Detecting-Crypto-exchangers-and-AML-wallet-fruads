@@ -17,7 +17,7 @@ ROOT = Path(__file__).parent
 OUT  = ROOT / "outputs"
 
 st.set_page_config(page_title="Crypto-AML Triage", layout="wide")
-st.title("Crypto-AML — USDT funnel triage")
+st.title("Crypto-AML - USDT funnel triage")
 st.caption("Research leads only. High fan-in / low fan-out also fits processors, OTC desks, "
            "and exchange deposits. Not a finding of guilt.")
 
@@ -44,11 +44,11 @@ cross      = load_csv(OUT / "cross_chain_matches.csv")
 # Prefer risk_v2 if available; else candidates
 df = risk_v2 if len(risk_v2) else candidates
 if not len(df):
-    st.error("No data found — run the notebook and pipeline_extended.py first.")
+    st.error("No data found - run the notebook and pipeline_extended.py first.")
     st.stop()
 
 # ----------------------------------------------------------------------------
-# Sidebar — filters
+# Sidebar - filters
 # ----------------------------------------------------------------------------
 with st.sidebar:
     st.header("Filters")
@@ -79,7 +79,7 @@ c1.metric("Filtered candidates", f"{len(filt):,}")
 c2.metric("Total inflow", f"${filt['in_usdt'].sum()/1e6:,.1f}M")
 c3.metric("Median senders/cand", f"{filt['distinct_senders'].median():.0f}")
 c4.metric("Single-recipient share",
-          f"{100*(filt['distinct_recipients']<=1).mean():.1f}%" if len(filt) else "—")
+          f"{100*(filt['distinct_recipients']<=1).mean():.1f}%" if len(filt) else "-")
 
 # ----------------------------------------------------------------------------
 # Tabs
@@ -119,7 +119,7 @@ with tab_plots:
         pivoted = sens.pivot(index="dust_floor_usd", columns="chain", values="n_candidates")
         st.line_chart(pivoted)
     if len(fp_peak):
-        st.subheader("Behavioral fingerprint — peak hour distribution (UTC)")
+        st.subheader("Behavioral fingerprint - peak hour distribution (UTC)")
         hour_counts = fp_peak["hour_utc"].value_counts().sort_index()
         st.bar_chart(hour_counts)
 
@@ -161,7 +161,7 @@ with tab_drilldown:
 with tab_artifacts:
     st.subheader("Files in outputs/")
     for p in sorted(OUT.glob("*.csv")):
-        st.write(f"• `{p.name}`  —  {p.stat().st_size:,} bytes")
+        st.write(f"• `{p.name}`  -  {p.stat().st_size:,} bytes")
     st.subheader("Cross-chain matches")
     if len(cross): st.dataframe(cross.head(30))
     else: st.caption("No identical wallet hex on both chains.")

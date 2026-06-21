@@ -16,7 +16,7 @@ OUT.mkdir(exist_ok=True)
 
 INPUT_CSV = ROOT / "usdt_funnel_candidates.csv"
 if not INPUT_CSV.exists():
-    raise SystemExit(f"{INPUT_CSV.name} not found — run the notebook first.")
+    raise SystemExit(f"{INPUT_CSV.name} not found - run the notebook first.")
 
 candidates = pd.read_csv(INPUT_CSV)
 top100 = candidates[candidates.chain == "ethereum"].nlargest(100, "in_usdt")["wallet"].tolist()
@@ -26,7 +26,7 @@ try:
     from web3 import Web3
     from ens import ENS
 except ImportError:
-    raise SystemExit("web3.py not installed — run: pip install web3")
+    raise SystemExit("web3.py not installed - run: pip install web3")
 
 w3 = None
 for url in config.ETH_RPC_URLS:

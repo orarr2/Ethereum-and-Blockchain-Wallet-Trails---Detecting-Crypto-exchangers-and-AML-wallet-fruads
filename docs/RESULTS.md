@@ -1,4 +1,4 @@
-# Reference run — findings
+# Reference run - findings
 
 A reference execution on **2026-06-10** with `LOOKBACK_DAYS=90` (Ethereum) and
 `TRON_LOOKBACK_DAYS=7` (Tron). Your numbers will differ because the windows are
@@ -35,10 +35,10 @@ detection itself, not in OFAC graph distance.
 
 ## Top candidates
 
-**Ethereum:** `0x748cd46c...086b23` — 18,802 distinct senders, only 25 outgoing
+**Ethereum:** `0x748cd46c...086b23` - 18,802 distinct senders, only 25 outgoing
 transactions in 90 days. $1.9 M in / $1.3 M out.
 
-**Tron:** `0x08146af6...d75dd983` — 6,212 distinct senders sending **$123.5 M**
+**Tron:** `0x08146af6...d75dd983` - 6,212 distinct senders sending **$123.5 M**
 to **one** recipient in just 7 days. Median transfer $3,000. Most likely a
 single major unlisted regional exchange.
 
@@ -61,7 +61,7 @@ single major unlisted regional exchange.
 | 500 | 11.9 % | 25.0 % | 38.5 % |
 | 1,000 | 4.6 % | 15.2 % | 26.0 % |
 
-A $200 floor drops two-thirds of candidates but keeps ~69% of inflow dollars —
+A $200 floor drops two-thirds of candidates but keeps ~69% of inflow dollars -
 useful "sweet spot" for high-precision triage.
 
 ## Cost (reference run)

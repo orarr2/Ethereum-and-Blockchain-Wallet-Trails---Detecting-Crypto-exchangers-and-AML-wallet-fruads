@@ -1,5 +1,5 @@
 """
-Extended pipeline (P0-P3 in the project roadmap) — runs additional BigQuery
+Extended pipeline (P0-P3 in the project roadmap) - runs additional BigQuery
 queries and produces enrichment artifacts on top of the core notebook output.
 
 Reads credentials from environment variables (or a local .env file). See
@@ -131,7 +131,7 @@ except Exception as e:
 # =============================================================================
 # P0.3 / 13.2  Nearest exchange anchor (ETH)
 # =============================================================================
-section("[P0.3] Section 13.2 — Nearest exchange anchor (ETH)")
+section("[P0.3] Section 13.2 - Nearest exchange anchor (ETH)")
 LABELS_URL = ("https://raw.githubusercontent.com/brianleect/etherscan-labels/"
               "main/data/etherscan/combined/combinedAllLabels.json")
 with urllib.request.urlopen(LABELS_URL, timeout=60) as r:
@@ -181,7 +181,7 @@ if exchanges and eth_cands:
 # =============================================================================
 # P0.3 / 13.3  Behavioural fingerprint (hour-of-day, round amounts)
 # =============================================================================
-section("[P0.3] Section 13.3 — Behavioural fingerprint (ETH)")
+section("[P0.3] Section 13.3 - Behavioural fingerprint (ETH)")
 fp_sql = f"""
 DECLARE usdt STRING DEFAULT '{config.USDT_ERC20}';
 DECLARE since TIMESTAMP DEFAULT TIMESTAMP_SUB(CURRENT_TIMESTAMP(),
@@ -211,10 +211,10 @@ except Exception as e:
     print(f"  [WARN] Fingerprint failed: {e}")
 
 # =============================================================================
-# P0.3 / 13.4  ENS resolution — handled by ens_lookup.py (no BQ needed)
+# P0.3 / 13.4  ENS resolution - handled by ens_lookup.py (no BQ needed)
 # =============================================================================
-section("[P0.3] Section 13.4 — ENS resolution")
-print("  Run `python ens_lookup.py` separately — uses a public Ethereum RPC, no BQ token.")
+section("[P0.3] Section 13.4 - ENS resolution")
+print("  Run `python ens_lookup.py` separately - uses a public Ethereum RPC, no BQ token.")
 try:
     ens_results = {}
     ens_csv = OUT / "ens_names.csv"
@@ -227,7 +227,7 @@ except Exception:
 # =============================================================================
 # P0.3 / 13.5  Attributability score
 # =============================================================================
-section("[P0.3] Section 13.5 — Attributability score")
+section("[P0.3] Section 13.5 - Attributability score")
 eth_df = candidates[candidates.chain == "ethereum"].copy()
 score = pd.Series(0.0, index=eth_df.index)
 w_lower = eth_df["wallet"].str.lower()
@@ -299,7 +299,7 @@ except Exception as e:
     tron_ext = pd.DataFrame()
 
 # =============================================================================
-# P1.5  Improved risk score (risk_v2) — local
+# P1.5  Improved risk score (risk_v2) - local
 # =============================================================================
 section("[P1.5] risk_v2")
 all_c = candidates.copy()
@@ -315,7 +315,7 @@ print(f"  range {all_c['risk_v2'].min():.1f}–{all_c['risk_v2'].max():.1f} | "
       f">=90: {int((all_c['risk_v2'] >= 90).sum())}")
 
 # =============================================================================
-# P1.6  Cross-chain matches — local
+# P1.6  Cross-chain matches - local
 # =============================================================================
 section("[P1.6] Cross-chain matches")
 eth_set = set(candidates[candidates.chain == "ethereum"]["wallet"])
@@ -334,7 +334,7 @@ for w in overlap:
 pd.DataFrame(cc_rows).to_csv(OUT / "cross_chain_matches.csv", index=False)
 
 # =============================================================================
-# P1.7  Behavioural-signature proxy clusters — local
+# P1.7  Behavioural-signature proxy clusters - local
 # =============================================================================
 section("[P1.7] Behavioural-signature proxy clusters")
 all_c["in_usdt_bucket"] = (np.log10(all_c["in_usdt"].clip(lower=1)) * 4).round() / 4
@@ -348,7 +348,7 @@ sig.to_csv(OUT / "sender_overlap_proxy_groups.csv", index=False)
 print(f"  Signature-groups with >=3 members: {len(sig)}")
 
 # =============================================================================
-# P1.8  Time-series burst detection — BigQuery
+# P1.8  Time-series burst detection - BigQuery
 # =============================================================================
 section("[P1.8] Time-series burst detection (top 50 ETH)")
 top50 = candidates[candidates.chain == "ethereum"].nlargest(50, "in_usdt")["wallet"].tolist()
@@ -381,7 +381,7 @@ if top50:
         print(f"  [WARN] Burst query failed: {e}")
 
 # =============================================================================
-# P2.10  Daily snapshot — local
+# P2.10  Daily snapshot - local
 # =============================================================================
 section("[P2.10] Daily snapshot")
 from datetime import datetime
@@ -421,7 +421,7 @@ look.to_csv(OUT / "etherscan_lookup_template.csv", index=False)
 print(f"  outputs/etherscan_lookup_template.csv ({len(look)} rows)")
 
 # =============================================================================
-# P3.12  Dust-floor sensitivity — local
+# P3.12  Dust-floor sensitivity - local
 # =============================================================================
 section("[P3.12] Dust-floor sensitivity")
 rows = []

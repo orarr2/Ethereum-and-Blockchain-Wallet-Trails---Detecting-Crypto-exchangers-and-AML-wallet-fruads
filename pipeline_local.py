@@ -1,5 +1,5 @@
 """
-Local-only portions of the extended pipeline — no BigQuery required.
+Local-only portions of the extended pipeline - no BigQuery required.
 Runs against the existing usdt_funnel_candidates.csv.
 
 Useful as a quick smoke-test before running the heavier pipeline_extended.py.
@@ -28,7 +28,7 @@ INPUT_CSV = ROOT / "usdt_funnel_candidates.csv"
 if not INPUT_CSV.exists():
     raise SystemExit(
         f"Input file {INPUT_CSV.name} not found.\n"
-        "Run Crypto-AML-Analysis.ipynb first — it produces this file."
+        "Run Crypto-AML-Analysis.ipynb first - it produces this file."
     )
 
 candidates = pd.read_csv(INPUT_CSV)

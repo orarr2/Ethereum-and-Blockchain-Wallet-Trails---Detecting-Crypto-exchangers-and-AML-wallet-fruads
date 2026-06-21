@@ -6,7 +6,7 @@
 - BigQuery API enabled on that project
 - The `gcloud` CLI installed (https://cloud.google.com/sdk/docs/install)
 
-## Step 1 — Create / pick a GCP project
+## Step 1 - Create / pick a GCP project
 
 ```bash
 gcloud auth login
@@ -18,9 +18,9 @@ gcloud services enable bigquery.googleapis.com
 ```
 
 The `crypto_ethereum`, `goog_blockchain_tron_mainnet_us`, and `crypto_bitcoin`
-datasets are public — you don't need to copy them, just pay for the bytes you scan.
+datasets are public - you don't need to copy them, just pay for the bytes you scan.
 
-## Step 2 — Pick an authentication path
+## Step 2 - Pick an authentication path
 
 ### Option A: short-lived access token (simplest)
 ```bash
@@ -46,10 +46,10 @@ gcloud iam service-accounts keys create key.json \
   --iam-account=crypto-aml-runner@YOUR_PROJECT_ID.iam.gserviceaccount.com
 export GOOGLE_APPLICATION_CREDENTIALS=$PWD/key.json
 ```
-Leave `BQ_ACCESS_TOKEN` blank in `.env`. **Never commit `key.json`** — it is in
+Leave `BQ_ACCESS_TOKEN` blank in `.env`. **Never commit `key.json`** - it is in
 `.gitignore`.
 
-## Step 3 — Optional: Etherscan API key
+## Step 3 - Optional: Etherscan API key
 
 For block-explorer name-tag enrichment in `pipeline_extended.py`:
 
@@ -58,7 +58,7 @@ For block-explorer name-tag enrichment in `pipeline_extended.py`:
 
 Without a key the pipeline still emits a lookup URL template you can use manually.
 
-## Step 4 — Smoke test
+## Step 4 - Smoke test
 
 ```bash
 python -c "import config; print('Project:', config.require_bq_project())"
@@ -68,9 +68,9 @@ Should print your project ID. If it fails, check `.env`.
 ```bash
 python -c "import config; c = config.make_bq_client(); print(list(c.list_datasets(max_results=1)))"
 ```
-If this succeeds you can hit BigQuery — you're ready.
+If this succeeds you can hit BigQuery - you're ready.
 
-## Step 5 — First run
+## Step 5 - First run
 
 ```bash
 jupyter lab Crypto-AML-Analysis.ipynb
@@ -82,9 +82,9 @@ for the default 90-day Ethereum + 7-day Tron windows.
 
 | Knob | Default | Effect |
 |---|---|---|
-| `BQ_MAX_GB` | 150 | Per-query scan ceiling — aborts before billing |
-| `LOOKBACK_DAYS` | 90 | Ethereum scan window — main cost lever |
-| `TRON_LOOKBACK_DAYS` | 7 | Tron scan window — Tron USDT volume is huge |
+| `BQ_MAX_GB` | 150 | Per-query scan ceiling - aborts before billing |
+| `LOOKBACK_DAYS` | 90 | Ethereum scan window - main cost lever |
+| `TRON_LOOKBACK_DAYS` | 7 | Tron scan window - Tron USDT volume is huge |
 
 To experiment cheaply, set `LOOKBACK_DAYS=14` and `TRON_LOOKBACK_DAYS=3`.
 
@@ -103,9 +103,9 @@ gcloud auth application-default revoke
 
 | Symptom | Fix |
 |---|---|
-| `RefreshError: credentials do not contain the necessary fields` | Access token expired — `gcloud auth print-access-token` again |
-| `403: ... does not have ... bigquery.jobs.create` | Account missing BigQuery permissions — add `roles/bigquery.jobUser` |
+| `RefreshError: credentials do not contain the necessary fields` | Access token expired - `gcloud auth print-access-token` again |
+| `403: ... does not have ... bigquery.jobs.create` | Account missing BigQuery permissions - add `roles/bigquery.jobUser` |
 | `404: Not found: Project ...` | `BQ_PROJECT` is wrong; use `gcloud projects list` to confirm |
-| Notebook fails on `float \| None` syntax | Python 3.9 — upgrade to 3.10+ or run `pipeline_local.py` instead of the notebook |
-| `Could not find a version that satisfies networkx>=3.3` | Python 3.9 — `pip install "networkx<3.3"` |
+| Notebook fails on `float \| None` syntax | Python 3.9 - upgrade to 3.10+ or run `pipeline_local.py` instead of the notebook |
+| `Could not find a version that satisfies networkx>=3.3` | Python 3.9 - `pip install "networkx<3.3"` |
 | `LlamaRPC` / public RPC connection refused | Try other endpoints in `ETH_RPC_URLS`; some are geo-restricted |
