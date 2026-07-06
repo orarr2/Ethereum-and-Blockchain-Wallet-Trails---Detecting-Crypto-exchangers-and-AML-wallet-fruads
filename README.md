@@ -15,7 +15,8 @@ Everything lives in **one self-contained notebook**: [`Crypto-AML-Analysis.ipynb
 | **Behavioural ranking** | Candidates ranked by an `informal_score` - depositor count, round-amount ratio, pass-through balance, and a human activity schedule (`hours_of_day_active`, `night_share`). Net accumulators (`pass_through < 0.5`) are flagged and excluded |
 | **Graph + ML** | NetworkX directed graph (PageRank / degree / clustering), mixer/funnel heuristics, multi-hop OFAC proximity, Isolation-Forest risk score - run on **both** chains |
 | **CTF** | OFAC-listed addresses are frozen/dormant in USDT (down-weighted), so CTF signal comes from a **behavioural donation-campaign score** (`terror_signals.py`): many small donors -> concentrated outflow, with an optional temporal burst |
-| **Identity** | Co-funding clustering (group funnels by shared depositors), nearest-exchange anchor, behavioural fingerprint (timezone), ENS resolution, attributability score, and a **modular free-source enrichment layer** (`enrichment.py`) |
+| **Identity** | Co-funding clustering (group funnels by shared depositors), **nearest-exchange anchor promoted to a first-class `actionability` signal** (a funnel with a direct link to a labelled exchange is a concrete KYC/subpoena target), behavioural fingerprint (timezone), ENS resolution, and a **modular free-source enrichment layer** (`enrichment.py`) |
+| **Triage** | Leads are the **per-chain top-K** by score, not a fixed threshold (which floods on Bitcoin); the master export is sorted by `actionability` = `risk_score` + exchange-anchor bonus |
 | **Visualise** | Fan-in/fan-out scatter coloured by `informal_score` + a node-link network plot of the top funnel hubs and their neighbours |
 
 ## Targeting

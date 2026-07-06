@@ -114,7 +114,44 @@ def campaign_score(
 
 
 def flag_campaigns(df: pd.DataFrame, threshold: float = 70.0, **kwargs) -> pd.DataFrame:
-    """Convenience: add `campaign_terror_score` + boolean `is_campaign_lead`."""
+    """Convenience: add `campaign_terror_score` + boolean `is_campaign_lead`.
+
+    NB: a fixed score threshold floods on chains whose funnels *all* have many
+    small senders (Bitcoin), so treat `is_campaign_lead` as a coarse cut and
+    prefer `top_leads()` / `select_leads()` for a triage-sized list.
+    """
     scored = campaign_score(df, **kwargs)
     scored["is_campaign_lead"] = scored["campaign_terror_score"] >= threshold
     return scored
+
+
+def top_leads(df: pd.DataFrame, per_chain_k: int = 25,
+              score_col: str = "campaign_terror_score") -> pd.DataFrame:
+    """Return the highest-scoring `per_chain_k` rows PER CHAIN.
+
+    A fixed threshold produced ~1,965 "leads" (40% of the pool) because
+    Bitcoin funnels inherently have thousands of small senders. Ranking within
+    each chain and keeping the top K yields a short, comparable, triage-sized
+    list instead of a flood. The returned frame is sorted by score descending.
+    """
+    if not len(df) or score_col not in df.columns:
+        return df.head(0) if len(df) else df
+    if "chain" in df.columns:
+        picked = (df.sort_values(score_col, ascending=False)
+                    .groupby("chain", group_keys=False).head(per_chain_k))
+    else:
+        picked = df.sort_values(score_col, ascending=False).head(per_chain_k)
+    return picked.sort_values(score_col, ascending=False)
+
+
+def select_leads(df: pd.DataFrame, per_chain_k: int = 25,
+                 score_col: str = "campaign_terror_score") -> pd.DataFrame:
+    """Add a boolean `is_top_campaign_lead` marking the per-chain top-K rows,
+    without dropping any rows (keeps the full frame for export)."""
+    out = df.copy()
+    if not len(out) or score_col not in out.columns:
+        out["is_top_campaign_lead"] = False
+        return out
+    keep = set(top_leads(out, per_chain_k=per_chain_k, score_col=score_col).index)
+    out["is_top_campaign_lead"] = out.index.isin(keep)
+    return out
