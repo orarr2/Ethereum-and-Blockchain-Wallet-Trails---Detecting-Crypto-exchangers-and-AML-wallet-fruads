@@ -14,8 +14,8 @@ Everything lives in **one self-contained notebook**: [`Crypto-AML-Analysis.ipynb
 | **Detection** | High fan-in / low fan-out "funnel" candidates within a **human-scale band** ($10K–$2M inflow, ≤5,000 distinct senders), a **dust floor** (median per-transfer ≥ $50), and smart-contract filtering (EOAs only) |
 | **Behavioural ranking** | Candidates ranked by an `informal_score` - depositor count, round-amount ratio, pass-through balance, and a human activity schedule (`hours_of_day_active`, `night_share`). Net accumulators (`pass_through < 0.5`) are flagged and excluded |
 | **Graph + ML** | NetworkX directed graph (PageRank / degree / clustering), mixer/funnel heuristics, multi-hop OFAC proximity, Isolation-Forest risk score - run on **both** chains |
-| **CTF** | Diagnostics showing OFAC-listed addresses are frozen/dormant in USDT on both chains (down-weighted in the risk score) |
-| **Identity** | Co-funding clustering (group funnels by shared depositors), nearest-exchange anchor, behavioural fingerprint (timezone), ENS resolution, attributability score |
+| **CTF** | OFAC-listed addresses are frozen/dormant in USDT (down-weighted), so CTF signal comes from a **behavioural donation-campaign score** (`terror_signals.py`): many small donors -> concentrated outflow, with an optional temporal burst |
+| **Identity** | Co-funding clustering (group funnels by shared depositors), nearest-exchange anchor, behavioural fingerprint (timezone), ENS resolution, attributability score, and a **modular free-source enrichment layer** (`enrichment.py`) |
 | **Visualise** | Fan-in/fan-out scatter coloured by `informal_score` + a node-link network plot of the top funnel hubs and their neighbours |
 
 ## Targeting
@@ -41,8 +41,13 @@ Keep the `block_timestamp` partition filter to control cost.
 
 ## Responsible use
 
-A high fan-in / low fan-out pattern, a mixer signature, or an N-hop link to a sanctioned address are
-**research signals, not findings of guilt** - they also fit legitimate processors, OTC desks and exchange
-deposit wallets. Identity work produces **entities and anchors**, never a real-world name; attribution to a
-person is for authorised enforcement (subpoena to the exchange that holds the KYC). Public on-chain data only;
-use authoritative OFAC designations for the sanctioned seeds.
+A high fan-in / low fan-out pattern, a mixer signature, a campaign-shaped inflow, or an N-hop link to a
+sanctioned address are **research signals, not findings of guilt** - they also fit legitimate processors,
+OTC desks and exchange deposit wallets. Identity work produces **entities and anchors**, never a real-world
+name; attribution to a person is for authorised enforcement (subpoena to the exchange that holds the KYC).
+
+**On IP / real-world attribution:** an IP address is *not* derivable from on-chain data - a ledger records
+value flow, never the network origin of the broadcasting peer. Recovering it requires off-chain
+infrastructure (listening nodes) or a licensed intelligence provider. The enrichment layer therefore ships
+only **free, on-chain sources** by default; IP attribution is a documented, non-wired plug point
+(`enrichment.IPAttributionSource`). Public on-chain data only; use authoritative OFAC designations for seeds.
