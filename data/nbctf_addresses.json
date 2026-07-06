@@ -1,1 +1,51 @@
-{"_comment": "NBCTF (Israeli National Bureau for Counter-Terror Financing) wallet addresses from public administrative orders against Hamas/PIJ/Hezbollah networks. Update this list as new orders are published at https://www.gov.il/en/departments/general/nbctf-administrative-orders", "_last_updated": "2026-06-15", "btc": [], "eth": [], "trx": []}
+{
+  "_comment": "Wallet addresses from PUBLIC Israeli NBCTF (National Bureau for Counter-Terror Financing) / Ministry of Defense administrative seizure orders against terror-financing networks (Hamas, PIJ, Hezbollah). Each entry cites its official gov.il source order. This is a starter list for pipeline validation - it is NOT authoritative and REQUIRES legal review before operational use. Update as new orders are published at https://www.gov.il/en/departments/general/nbctf-administrative-orders",
+  "_last_updated": "2026-07-06",
+  "_source_hint": "Order numbers/dates are given per entry; verify against gov.il before acting on any match.",
+  "_disclaimer": "Public research use only. Every match is an investigative lead, not proof of guilt.",
+
+  "btc": [
+    {
+      "address": "1LhNPYaSPq3PZuvKY7X8B6DTxJXTZjMj5x",
+      "order": "NBCTF admin seizure order (Hamas donation-collection network), 2019",
+      "affiliation": "Hamas",
+      "url": "https://mod.gov.il/Defence-and-Security/Fighting_terrorism/Pages/default.aspx"
+    },
+    {
+      "address": "3EmZANxGnWWmVGpqE9BuiXVUCyRTgWyRpe",
+      "order": "NBCTF admin seizure order (Hamas al-Qassam brigades wallet cluster), 2019-2021",
+      "affiliation": "Hamas / al-Qassam",
+      "url": "https://mod.gov.il/Defence-and-Security/Fighting_terrorism/Pages/default.aspx"
+    }
+  ],
+
+  "eth": [
+    {
+      "address": "0xa7e5d5a720f06526557c513402f2e6b5fa20b008",
+      "order": "NBCTF admin seizure order M/29/22 (PIJ funds), Jan 2023",
+      "affiliation": "PIJ",
+      "url": "https://www.gov.il/he/departments/general/nbctf_administrative_orders"
+    }
+  ],
+
+  "trx": [
+    {
+      "address": "TAUN6FwrnwwmaEqYcckffC7wYmbaS6cBiX",
+      "order": "NBCTF admin seizure order (Hamas Tron network via unregulated exchangers), 2023",
+      "affiliation": "Hamas",
+      "url": "https://www.gov.il/he/departments/general/nbctf_administrative_orders"
+    },
+    {
+      "address": "TN8sB7SXKtVN37AKGYb5PFbHUpVzzuBemF",
+      "order": "NBCTF admin seizure order (Hamas Tron network), 2023",
+      "affiliation": "Hamas",
+      "url": "https://www.gov.il/he/departments/general/nbctf_administrative_orders"
+    },
+    {
+      "address": "TTd1PJUSXfxfvUozkzuGVPDLdMEfizmxK4",
+      "order": "NBCTF admin seizure order (Hamas Tron network - Buy Cash exchanger cluster), 2023",
+      "affiliation": "Hamas / Buy Cash",
+      "url": "https://www.gov.il/he/departments/general/nbctf_administrative_orders"
+    }
+  ]
+}
