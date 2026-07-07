@@ -126,7 +126,7 @@ def build_report(master: pd.DataFrame,
     n_bridge = int(m.get("is_bridge_wallet", pd.Series([False]*n_total)).sum()) if n_total else 0
     n_interesting = int(m.get("hits_interesting_country", pd.Series([False]*n_total)).sum()) if n_total else 0
     n_terror = int(m.get("risk_categories", pd.Series([[]]*n_total)).apply(
-        lambda cs: "terror" in (cs or [])).sum()) if n_total else 0
+        lambda cs: isinstance(cs, (list, tuple, set)) and "terror" in cs).sum()) if n_total else 0
 
     kpi_html = "".join(f'<div class="kpi"><div class="n">{_fmt_int(v)}</div><div class="l">{escape(k)}</div></div>'
                         for k, v in [
@@ -141,7 +141,8 @@ def build_report(master: pd.DataFrame,
                         ])
 
     def _row_cls(r):
-        if "terror" in (r.get("risk_categories") or []): return "terror"
+        rc = r.get("risk_categories")
+        if isinstance(rc, (list, tuple, set)) and "terror" in rc: return "terror"
         if r.get("hits_interesting_country"): return "interesting"
         if r.get("has_exchange_anchor") and r.get("risk_score", 0) >= 60: return "high"
         return ""
