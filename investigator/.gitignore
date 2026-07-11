@@ -1,0 +1,7 @@
+# Runtime artifacts of the investigator layer - regenerated, never committed.
+data/verdicts.jsonl
+data/linucb_state.pkl
+outputs/ltr_model.json
+outputs/dossiers/
+__pycache__/
+*.pyc

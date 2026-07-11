@@ -1,0 +1,10 @@
+# Extra dependencies for the investigator layer ONLY.
+# The base project's requirements.txt already covers pandas, numpy, networkx,
+# streamlit, google-cloud-bigquery, web3, etc. Install those first, then these.
+
+anthropic>=0.40.0        # default LLM provider (Component A). Not needed for provider=mock.
+xgboost>=2.0.0           # offline pairwise LTR warm-start (Component B). Optional; degrades gracefully.
+jsonschema>=4.21.0       # tool I/O validation. Optional; falls back to a required-key check.
+
+# openai is NOT pinned here: only needed if you switch INVESTIGATOR_LLM_PROVIDER=openai.
+# pip install openai

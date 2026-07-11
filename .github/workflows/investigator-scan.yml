@@ -1,0 +1,99 @@
+name: Investigator scan
+
+# Autonomous twice-daily scan that runs even when your PC is off.
+# It re-ranks the committed master table, writes dossiers, publishes them to
+# GitHub Pages, and pushes a digest to your phone via a Telegram bot.
+#
+# Works with ZERO secrets (degrades to the offline `mock` provider and a
+# dry-run notify). Add secrets/variables to make it real - see investigator/README.md.
+
+on:
+  schedule:
+    - cron: "0 6 * * *"    # 06:00 UTC (~09:00 Israel)
+    - cron: "0 18 * * *"   # 18:00 UTC (~21:00 Israel)
+  workflow_dispatch:        # manual "Run workflow" button
+    inputs:
+      top_k:
+        description: "Dossiers per chain"
+        default: "3"
+      chains:
+        description: "Comma-separated chains"
+        default: "ethereum,tron,bitcoin"
+      provider:
+        description: "LLM provider (mock|anthropic)"
+        default: ""
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# don't let two scheduled runs collide
+concurrency:
+  group: investigator-scan
+  cancel-in-progress: false
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    env:
+      # provider: workflow input > repo variable > 'mock'
+      INVESTIGATOR_LLM_PROVIDER: ${{ github.event.inputs.provider || vars.INVESTIGATOR_LLM_PROVIDER || 'mock' }}
+      INVESTIGATOR_LLM_MODEL: ${{ vars.INVESTIGATOR_LLM_MODEL || 'claude-haiku-4-5' }}
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      BQ_PROJECT: ${{ vars.BQ_PROJECT }}
+      INVESTIGATOR_BQ_KILL_USD_DAILY: ${{ vars.INVESTIGATOR_BQ_KILL_USD_DAILY || '10' }}
+      ADAPTIVE_TRIAGE_ENABLED: ${{ vars.ADAPTIVE_TRIAGE_ENABLED || 'false' }}
+      TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+      TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+      TOP_K: ${{ github.event.inputs.top_k || '3' }}
+      CHAINS: ${{ github.event.inputs.chains || 'ethereum,tron,bitcoin' }}
+      HAS_GCP: ${{ secrets.GCP_SA_KEY != '' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install -r investigator/requirements.txt
+
+      - name: Configure BigQuery auth (optional)
+        if: env.HAS_GCP == 'true'
+        env:
+          GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
+        run: |
+          printf '%s' "$GCP_SA_KEY" > "$RUNNER_TEMP/gcp_sa.json"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/gcp_sa.json" >> "$GITHUB_ENV"
+
+      - name: Run investigator scan
+        run: |
+          python -m investigator.run_nightly --top-k "$TOP_K" --chains "$CHAINS"
+
+      - name: Build Pages site
+        run: python -m investigator.publish_site
+
+      - name: Configure Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: investigator/outputs/site
+
+      - name: Deploy to Pages
+        id: deploy
+        uses: actions/deploy-pages@v4
+
+      - name: Push digest to phone (Telegram)
+        env:
+          INVESTIGATOR_SITE_URL: ${{ steps.deploy.outputs.page_url }}
+        run: python -m investigator.notify
