@@ -113,6 +113,64 @@ python -m investigator.notify
 $env:TELEGRAM_BOT_TOKEN='...'; $env:TELEGRAM_CHAT_ID='...'; python -m investigator.notify
 ```
 
+## סריקה יומית אוטומטית (Refresh workflow)
+
+Workflow שלישי - `investigator-refresh.yml` - רץ **פעם ביום ב-10:00 בישראל
+(07:00 UTC)**, מריץ את המחברת מקצה לקצה על BigQuery, מגלה ארנקים חדשים, וכותב
+`master.csv` מעודכן חזרה ל-main עם `[skip ci]` כדי לא להפעיל אוטומטית סריקה
+מיותרת. שעתיים אחר כך (12:00 בישראל) - ה-cron של ה-scan קורא את ה-master
+החדש ושולח לך את ה-PDF+CSV המעודכנים.
+
+### מה שצריך להגדיר פעם אחת (חד-פעמי)
+
+בריפו → **Settings → Secrets and variables → Actions**:
+
+| סוג | שם | ערך | מקור |
+|---|---|---|---|
+| Secret | `GCP_SA_KEY` | תוכן ה-JSON של Service Account ל-BigQuery | GCP Console → IAM → Service Accounts → Keys → Add Key (JSON) |
+| Variable | `BQ_PROJECT` | ה-project id שלך ב-GCP | GCP Console → כותרת עליונה |
+| Variable | `INVESTIGATOR_BQ_KILL_USD_DAILY` | `2` | תקרה יומית ב-USD (בקוד ה-kill-switch) |
+| Variable | `BQ_MAX_GB` | `200` | תקרה פר-query בג'יגה |
+| Variable | `LOOKBACK_DAYS` | `90` | חלון סריקה ETH (ברירת מחדל 90 יום) |
+| Variable | `TRON_LOOKBACK_DAYS` | `7` | חלון Tron (7 יום) |
+
+### שכבת הגנה 1 - Kill-switch בקוד
+
+`config.run_query` מונה את סך העלות שנצברה במהלך הריצה. בכל query בודק אם
+המעבר עליו יחצה את `INVESTIGATOR_BQ_KILL_USD_DAILY` - אם כן, זורק חריגה
+וה-workflow נכשל אדום לפני שיתחייב עוד cent. **התקרה הזו היא ההגנה החזקה
+ביותר**, כי היא בתוך ה-Python session ולא תלויה בפילטרים חיצוניים.
+
+### שכבת הגנה 2 - Billing Alert ב-GCP (חובה להוסיף)
+
+זו הרשת ביטחון החיצונית: אם משהו משתולל מחוץ ל-CI (למשל אתה מריץ ידנית),
+Google ישלח לך מייל אזהרה. **חד-פעמי, 5 דקות**:
+
+1. פתח [GCP Billing → Budgets & alerts](https://console.cloud.google.com/billing/budgets)
+2. בחר את חשבון החיוב שמקושר ל-`BQ_PROJECT` שלך
+3. **CREATE BUDGET** → תן שם: `AML Investigator daily cap`
+4. **Scope**: Projects → בחר את `BQ_PROJECT` שלך
+5. **Amount**:
+   - Budget type: **Specified amount**
+   - Target amount: `10` (USD) - כל חודש
+6. **Actions - Set your budget alerts**:
+   - התראה ב-**50%** ($5) - email
+   - התראה ב-**90%** ($9) - email
+   - התראה ב-**100%** ($10) - email
+   - סמן ✅ **Send alerts to billing admins and users**
+7. **FINISH**.
+
+כשהחשבון יעבור סף - תקבל מייל **מיידית**. זה לא עוצר חיוב אוטומטית, אבל
+נותן לך זמן לפעול לפני שהעלות עולה מדרגה.
+
+### עלות משוערת
+
+- ריצה מלאה = **~$1** לפי הרצת הייחוס (~160GB)
+- 1× ליום × 30 = **~$30/חודש גולמי**
+- מינוס 1TB חינם/חודש (~$6.25) = **~$24/חודש נטו**
+- חשבון GCP חדש? יש **$300 קרדיט חינם ל-90 יום** - שלושה חודשים ראשונים ללא עלות בכלל
+- Kill-switch יעצור לפני $2/יום = תקרה של $60/חודש
+
 ## הערה
 
 כל דוסייר וכל התראה הם **כיווני חקירה (research lead), לא קביעת אשמה.** כל טענה

@@ -110,15 +110,54 @@ def make_bq_client():
     return bigquery.Client(project=BQ_PROJECT)
 
 
+# Per-Python-session cumulative BigQuery spend, in USD. When
+# INVESTIGATOR_BQ_KILL_USD_DAILY is set to > 0, `run_query` refuses to submit a
+# query if the projected cumulative spend would cross the cap. Backwards
+# compatible: unset (default) -> no cap enforcement, same behavior as before.
+_BQ_SESSION_SPENT_USD = {"total": 0.0}
+BQ_USD_PER_TB: float = float(os.environ.get("BQ_USD_PER_TB", "6.25"))
+
+
+def _kill_switch_cap_usd() -> float:
+    try:
+        return float(os.environ.get("INVESTIGATOR_BQ_KILL_USD_DAILY", "0"))
+    except ValueError:
+        return 0.0
+
+
+def _cost_usd_of_gb(gb: float) -> float:
+    return float(gb) / 1024.0 * BQ_USD_PER_TB
+
+
+def _check_kill_switch(projected_usd: float) -> None:
+    cap = _kill_switch_cap_usd()
+    if cap <= 0:
+        return
+    if _BQ_SESSION_SPENT_USD["total"] + projected_usd > cap:
+        raise RuntimeError(
+            "[BQ kill-switch] projected cumulative spend "
+            f"${_BQ_SESSION_SPENT_USD['total']:.4f} + ${projected_usd:.4f} "
+            f"would exceed INVESTIGATOR_BQ_KILL_USD_DAILY=${cap}. Aborting."
+        )
+
+
+def bq_session_spent_usd() -> float:
+    """How much BigQuery has cost THIS Python session so far."""
+    return _BQ_SESSION_SPENT_USD["total"]
+
+
 def estimate_cost(client, sql: str, max_gb: Optional[float] = None) -> float:
-    """Dry-run a query and return its scan size in GB. Refuse if > max_gb."""
+    """Dry-run a query and return its scan size in GB. Refuse if > max_gb or if
+    the projected cumulative session spend would exceed the kill-switch cap."""
     from google.cloud import bigquery
     cap = BQ_MAX_GB if max_gb is None else max_gb
     job = client.query(sql, job_config=bigquery.QueryJobConfig(dry_run=True, use_query_cache=False))
     gb = job.total_bytes_processed / 1024 ** 3
-    print(f"  dry-run: {gb:,.2f} GB (~${job.total_bytes_processed / 1024 ** 4 * 6.25:,.4f})")
+    usd = _cost_usd_of_gb(gb)
+    print(f"  dry-run: {gb:,.2f} GB (~${usd:,.4f})")
     if gb > cap:
         raise RuntimeError(f"Would scan {gb:.1f} GB > {cap} GB cap")
+    _check_kill_switch(usd)
     return gb
 
 
@@ -126,6 +165,13 @@ def run_query(client, sql: str, max_gb: Optional[float] = None):
     """Cost-estimate then execute a query, returning a pandas DataFrame."""
     from google.cloud import bigquery
     cap = BQ_MAX_GB if max_gb is None else max_gb
-    estimate_cost(client, sql, cap)
+    gb = estimate_cost(client, sql, cap)   # already runs kill-switch pre-check
+    usd = _cost_usd_of_gb(gb)
     cfg = bigquery.QueryJobConfig(maximum_bytes_billed=int(cap * 1024 ** 3))
-    return client.query(sql, job_config=cfg).to_dataframe(create_bqstorage_client=False)
+    df = client.query(sql, job_config=cfg).to_dataframe(create_bqstorage_client=False)
+    _BQ_SESSION_SPENT_USD["total"] += usd
+    ks_cap = _kill_switch_cap_usd()
+    if ks_cap > 0:
+        print(f"  [BQ session spent: ${_BQ_SESSION_SPENT_USD['total']:.4f} "
+              f"/ cap ${ks_cap}]")
+    return df

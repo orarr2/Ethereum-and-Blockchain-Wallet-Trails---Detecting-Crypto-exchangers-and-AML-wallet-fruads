@@ -1,0 +1,96 @@
+name: Investigator daily BQ refresh
+
+# Runs the notebook end-to-end against live BigQuery once a day, refreshes
+# suspicious_wallets_master.csv (and per-chain slices + report.html) and
+# commits them back with [skip ci]. The 12:00 IL scan cron then reads the
+# fresh master.
+#
+# COST GUARDRAILS
+# ---------------
+# 1. Hard cap in code: config.run_query aborts if the cumulative session
+#    spend would exceed INVESTIGATOR_BQ_KILL_USD_DAILY (repo variable,
+#    default 2.00 = $2/day).
+# 2. Per-query BYTE cap: `maximum_bytes_billed` set to BQ_MAX_GB in every
+#    query (default 200 GB).
+# 3. Recommended EXTERNAL: a GCP-side Billing budget alert on the same
+#    project (steps in investigator/SETUP_TELEGRAM.he.md).
+
+on:
+  schedule:
+    - cron: "0 7 * * *"   # 07:00 UTC = 10:00 IDT (2h before the 12:00 IL scan)
+  workflow_dispatch:
+    inputs:
+      kill_usd:
+        description: "Override BQ daily cap (USD)"
+        default: ""
+
+permissions:
+  contents: write        # commit the refreshed CSVs back to main
+
+concurrency:
+  group: investigator-refresh
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90   # notebook runs ~30-60 min; 90 min headroom
+    env:
+      BQ_PROJECT: ${{ vars.BQ_PROJECT }}
+      BQ_MAX_GB: ${{ vars.BQ_MAX_GB || '200' }}
+      INVESTIGATOR_BQ_KILL_USD_DAILY: ${{ github.event.inputs.kill_usd || vars.INVESTIGATOR_BQ_KILL_USD_DAILY || '2' }}
+      LOOKBACK_DAYS: ${{ vars.LOOKBACK_DAYS || '90' }}
+      TRON_LOOKBACK_DAYS: ${{ vars.TRON_LOOKBACK_DAYS || '7' }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Verify GCP credentials are set
+        run: |
+          if [ -z "${{ secrets.GCP_SA_KEY }}" ] || [ -z "${{ vars.BQ_PROJECT }}" ]; then
+            echo "::error::GCP_SA_KEY secret or BQ_PROJECT variable is missing." >&2
+            echo "Add both under Settings -> Secrets and variables -> Actions." >&2
+            exit 1
+          fi
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install papermill ipykernel
+
+      - name: Configure BigQuery auth
+        env:
+          GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
+        run: |
+          printf '%s' "$GCP_SA_KEY" > "$RUNNER_TEMP/gcp_sa.json"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/gcp_sa.json" >> "$GITHUB_ENV"
+
+      - name: Execute notebook (kill-switch enforced by config.py)
+        run: python -m investigator.refresh_notebook
+
+      - name: Commit refreshed artifacts (skip if nothing changed)
+        run: |
+          git config user.email "actions@github.com"
+          git config user.name "Investigator refresh"
+          # Stage only the notebook outputs (skip the executed .ipynb dump)
+          git add suspicious_wallets_master.csv \
+                  suspicious_usdt_eth.csv suspicious_usdt_trc20.csv \
+                  suspicious_btc.csv suspicious_zec.csv \
+                  report.html \
+                  data/ctf_leads.csv data/suspicious_wallets.csv \
+                  data/suspicious_usdt_eth.csv data/suspicious_usdt_trc20.csv \
+                  data/suspicious_btc.csv data/suspicious_zec.csv 2>/dev/null || true
+          if git diff --cached --quiet; then
+            echo "no changes to commit - master is unchanged since yesterday"
+            exit 0
+          fi
+          MASTER_ROWS=$(wc -l < suspicious_wallets_master.csv)
+          git commit -m "Daily BQ refresh $(date -u +%Y-%m-%d) - ${MASTER_ROWS} rows in master [skip ci]"
+          git push
