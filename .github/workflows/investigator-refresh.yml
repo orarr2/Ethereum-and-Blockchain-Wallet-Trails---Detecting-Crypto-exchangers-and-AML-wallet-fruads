@@ -26,6 +26,7 @@ on:
 
 permissions:
   contents: write        # commit the refreshed CSVs back to main
+  id-token: write        # mint the GitHub OIDC token used by Workload Identity Federation
 
 concurrency:
   group: investigator-refresh
@@ -51,26 +52,31 @@ jobs:
           python-version: "3.11"
           cache: pip
 
-      - name: Verify GCP credentials are set
+      - name: Verify GCP config is set
         run: |
-          if [ -z "${{ secrets.GCP_SA_KEY }}" ] || [ -z "${{ vars.BQ_PROJECT }}" ]; then
-            echo "::error::GCP_SA_KEY secret or BQ_PROJECT variable is missing." >&2
-            echo "Add both under Settings -> Secrets and variables -> Actions." >&2
+          if [ -z "${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}" ] || \
+             [ -z "${{ vars.GCP_SERVICE_ACCOUNT }}" ] || \
+             [ -z "${{ vars.BQ_PROJECT }}" ]; then
+            echo "::error::Missing GCP_WORKLOAD_IDENTITY_PROVIDER, GCP_SERVICE_ACCOUNT, or BQ_PROJECT variable." >&2
+            echo "Add them under Settings -> Secrets and variables -> Actions -> Variables." >&2
             exit 1
           fi
+
+      - name: Authenticate to GCP via Workload Identity Federation
+        # No JSON keys. GitHub mints a short-lived OIDC token; GCP exchanges it
+        # for a temporary access token bound to the service account. The action
+        # writes an ADC credential file and sets GOOGLE_APPLICATION_CREDENTIALS,
+        # so config.make_bq_client() picks it up transparently.
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ vars.GCP_SERVICE_ACCOUNT }}
 
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           pip install papermill ipykernel
-
-      - name: Configure BigQuery auth
-        env:
-          GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
-        run: |
-          printf '%s' "$GCP_SA_KEY" > "$RUNNER_TEMP/gcp_sa.json"
-          echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/gcp_sa.json" >> "$GITHUB_ENV"
 
       - name: Execute notebook (kill-switch enforced by config.py)
         run: python -m investigator.refresh_notebook
