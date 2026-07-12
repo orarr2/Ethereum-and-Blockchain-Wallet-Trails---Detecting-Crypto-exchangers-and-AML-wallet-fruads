@@ -1,19 +1,32 @@
 name: Investigator bot poll
 
-# Two-way Telegram bot on GitHub Actions cron: every 5 min this job calls
-# Telegram's getUpdates, dispatches each user command in the whitelisted chat,
-# and replies. Free tier only (public repo -> unlimited Actions minutes).
+# Two-way Telegram bot on GitHub Actions.
+#
+# GitHub's `*/5 * * * *` cron on public repos is throttled to roughly ONE run
+# per hour in practice, and a single short getUpdates covers a 1-second window
+# per run - so a user command sent at any other moment would go unanswered.
+#
+# Two mitigations:
+#  1. `poll_loop` inside bot.py stays open for ~9 minutes per invocation with
+#     25-second LONG polls (server-side blocking), so any command that arrives
+#     during those 9 minutes gets a sub-second reply.
+#  2. `workflow_run` triggers this job right after the scan or refresh
+#     completes, so a bot session opens minutes after every dataflow event.
 
 on:
   schedule:
-    - cron: "*/5 * * * *"    # every 5 minutes
+    - cron: "*/10 * * * *"    # `*/10` is honored more reliably than `*/5`
   workflow_dispatch:
+  workflow_run:
+    workflows: ["Investigator scan", "Investigator daily BQ refresh"]
+    types: [completed]
 
 permissions:
   contents: read
 
-# Two poll cycles must never race - if one takes longer than 5 min the next
-# is canceled and the offset ack in the running cycle still covers it.
+# If a new invocation fires (cron OR workflow_run) while a poll loop is still
+# running, cancel the old one - the new one is fresher and simpler than
+# stacking a backlog.
 concurrency:
   group: investigator-bot-poll
   cancel-in-progress: true
@@ -21,10 +34,13 @@ concurrency:
 jobs:
   poll:
     runs-on: ubuntu-latest
+    timeout-minutes: 15   # loop is ~9 min; 15 min gives room for install + slack
     env:
       TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
       TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
       INVESTIGATOR_SITE_URL: ${{ vars.INVESTIGATOR_SITE_URL }}
+      BOT_LOOP_SECONDS: "540"        # 9 minutes of long polling per run
+      BOT_LONG_POLL_SECONDS: "25"    # each getUpdates blocks up to 25s
     steps:
       - uses: actions/checkout@v4
 
@@ -46,5 +62,5 @@ jobs:
           pip install -r requirements.txt
           pip install -r investigator/requirements.txt
 
-      - name: Poll and dispatch commands
+      - name: Poll and dispatch commands (long-poll loop)
         run: python -m investigator.bot

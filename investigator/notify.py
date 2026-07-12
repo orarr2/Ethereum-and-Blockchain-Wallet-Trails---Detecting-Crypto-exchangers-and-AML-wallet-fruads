@@ -114,9 +114,11 @@ def _api(token: str, method: str, params: dict | None = None) -> dict:
     a generic HTTPError). Redacts token when raising."""
     url = f"https://api.telegram.org/bot{token}/{method}"
     data = urllib.parse.urlencode(params or {}).encode()
+    # 60s HTTP timeout is generous for Telegram's short polls (immediate return)
+    # AND leaves room for long polls up to 30s server-side without tripping.
     try:
         req = urllib.request.Request(url, data=data)
-        with urllib.request.urlopen(req, timeout=30) as r:
+        with urllib.request.urlopen(req, timeout=60) as r:
             body = r.read().decode("utf-8", errors="replace")
     except urllib.error.HTTPError as e:
         # Telegram returns useful JSON even on 4xx - read it

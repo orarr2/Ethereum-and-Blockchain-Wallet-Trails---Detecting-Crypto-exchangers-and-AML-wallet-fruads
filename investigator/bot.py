@@ -218,21 +218,27 @@ def handle_command(text: str) -> str:
         return f"error handling {escape(cmd)}: {type(e).__name__}: {e}"
 
 
-def poll_once() -> dict:
+def poll_once(long_poll_seconds: int = 0) -> dict:
+    """One Telegram getUpdates -> handler dispatch cycle.
+
+    long_poll_seconds > 0 turns this into a true LONG POLL: the request blocks
+    server-side up to that many seconds waiting for a message, so latency
+    between "user sends /report" and "bot replies" collapses from ~cron-interval
+    to sub-second while the workflow is alive.
+    """
     token = os.environ.get("TELEGRAM_BOT_TOKEN", "").strip()
     expected_chat = os.environ.get("TELEGRAM_CHAT_ID", "").strip()
     if not token or not expected_chat:
         print("[bot] TELEGRAM secrets missing; nothing to poll.")
         return {"processed": 0, "reason": "no_credentials"}
 
-    updates = _api(token, "getUpdates", {"timeout": "0"})
+    updates = _api(token, "getUpdates", {"timeout": str(int(long_poll_seconds))})
     if not updates.get("ok"):
         print(f"[bot] getUpdates failed: {updates}")
         return {"processed": 0, "reason": updates.get("description", "getUpdates_failed")}
 
     events = updates.get("result") or []
     if not events:
-        print("[bot] no new updates.")
         return {"processed": 0, "ignored": 0}
 
     processed = 0
@@ -260,6 +266,53 @@ def poll_once() -> dict:
     return {"processed": processed, "ignored": ignored}
 
 
+def poll_loop(duration_seconds: int = 540, long_poll_seconds: int = 25) -> dict:
+    """Long-poll Telegram in a tight loop for `duration_seconds` total.
+
+    GitHub Actions throttles a `*/5` cron on public repos to roughly once per
+    hour (empirically observed). One short poll per invocation therefore covers
+    a 1-second window every 60 minutes - useless. This loop stays open for the
+    whole workflow lifetime, doing 25-second long polls, so a user command sent
+    at any time during the run gets a sub-second reply.
+    """
+    import time
+    # Bail out immediately when creds are missing - a dry-run loop that spins
+    # for 9 minutes printing "missing" once per iteration is pure noise.
+    if not (os.environ.get("TELEGRAM_BOT_TOKEN", "").strip()
+            and os.environ.get("TELEGRAM_CHAT_ID", "").strip()):
+        print("[bot] TELEGRAM secrets missing; loop aborted (dry run).")
+        return {"processed": 0, "reason": "no_credentials"}
+
+    end = time.time() + max(1, int(duration_seconds))
+    total = {"processed": 0, "ignored": 0}
+    print(f"[bot] entering poll loop for ~{duration_seconds}s (long-poll {long_poll_seconds}s per call)")
+    consecutive_errors = 0
+    while time.time() < end:
+        try:
+            r = poll_once(long_poll_seconds=long_poll_seconds)
+            consecutive_errors = 0
+        except Exception as e:
+            consecutive_errors += 1
+            backoff = min(30, 2 * consecutive_errors)
+            print(f"[bot] poll_once error #{consecutive_errors}: {type(e).__name__}: {e}; "
+                  f"sleeping {backoff}s and retrying")
+            time.sleep(backoff)
+            continue
+        # If getUpdates itself fails (e.g. temporary API error), sleep before
+        # retrying so we don't hammer Telegram at 1000 Hz.
+        if r.get("reason") and r["reason"] not in ("", "no_credentials"):
+            time.sleep(3)
+        total["processed"] += r.get("processed", 0)
+        total["ignored"] += r.get("ignored", 0)
+    print(f"[bot] loop finished. total processed={total['processed']} ignored={total['ignored']}")
+    return total
+
+
 if __name__ == "__main__":  # pragma: no cover
-    poll_once()
+    duration = int(os.environ.get("BOT_LOOP_SECONDS", "540"))   # 9 min default
+    long_poll = int(os.environ.get("BOT_LONG_POLL_SECONDS", "25"))
+    if duration > 0:
+        poll_loop(duration_seconds=duration, long_poll_seconds=long_poll)
+    else:
+        poll_once()
     sys.exit(0)
