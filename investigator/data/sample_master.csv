@@ -1,0 +1,12 @@
+wallet,chain,risk_score,actionability,informal_score,funnel_signal,distinct_senders,distinct_recipients,in_usdt,in_median_usdt,in_out_tx_ratio,campaign_terror_score,components_bridged,hop_to_ofac,night_share,round_amount_ratio,has_exchange_anchor,is_bridge_wallet,hits_interesting_country,cluster_id,anchor_exchange,affiliation,demo
+0xad285fdedfc0d5f944a33e478356524293c7ec68,ethereum,68.1,93.1,0.71,0.42,1180,4,1450000,120,0.003,12,2,,0.22,0.34,True,True,False,1,Binance 15,,True
+0x8b7710171181ec25ce9aa254eb074ec85559347b,ethereum,77.0,77.0,0.64,0.38,860,6,780000,95,0.007,8,0,,0.18,0.29,False,False,False,1,,,True
+0x7af4a738b30775a836a050a4c85f4c58689aed38,ethereum,76.4,76.4,0.62,0.36,910,5,690000,110,0.006,5,0,,0.20,0.27,False,False,False,2,,,True
+0x61a8a99099a4d46124cf2914bd8eb8dfafd7c99d,ethereum,49.7,74.7,0.55,0.31,540,3,410000,140,0.006,4,1,,0.15,0.31,True,False,False,1,Binance 17,,True
+0xbf8d7d490323d775ada8b20a35472acb7fc6a0c4,ethereum,48.3,73.3,0.53,0.30,505,4,380000,150,0.008,3,0,,0.14,0.33,True,False,False,3,Binance 16,,True
+0xa7e5d5a720f06526557c513402f2e6b5fa20b008,ethereum,64.0,71.0,0.58,0.29,320,2,260000,180,0.006,88,0,1,0.41,0.52,False,False,True,4,,PIJ (NBCTF M/29/22),True
+TAUN6FwrnwwmaEqYcckffC7wYmbaS6cBiX,tron,75.5,75.5,0.66,0.44,2100,7,540000,45,0.003,91,1,1,0.47,0.61,False,True,True,5,,Hamas (NBCTF 2023),True
+TTd1PJUSXfxfvUozkzuGVPDLdMEfizmxK4,tron,70.2,70.2,0.61,0.40,1740,5,430000,52,0.004,84,0,1,0.44,0.57,False,False,True,5,,Hamas / Buy Cash (NBCTF 2023),True
+TN8sB7SXKtVN37AKGYb5PFbHUpVzzuBemF,tron,58.9,58.9,0.49,0.33,980,4,210000,60,0.006,73,0,2,0.39,0.49,False,False,True,5,,Hamas (NBCTF 2023),True
+1LhNPYaSPq3PZuvKY7X8B6DTxJXTZjMj5x,bitcoin,61.4,61.4,0.52,0.51,760,3,190000,70,0.005,79,0,1,0.36,0.44,False,False,True,6,,Hamas (NBCTF 2019),True
+3EmZANxGnWWmVGpqE9BuiXVUCyRTgWyRpe,bitcoin,55.7,55.7,0.47,0.46,610,4,150000,80,0.007,68,1,2,0.33,0.41,False,True,True,6,,Hamas / al-Qassam (NBCTF 2019-2021),True

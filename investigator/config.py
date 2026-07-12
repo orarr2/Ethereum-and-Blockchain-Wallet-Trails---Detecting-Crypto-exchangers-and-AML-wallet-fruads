@@ -42,6 +42,13 @@ DOSSIER_INDEX_PATH = DOSSIERS_DIR / "index.json"
 MASTER_CSV = PROJECT_ROOT / "suspicious_wallets_master.csv"
 NBCTF_JSON = PROJECT_ROOT / "data" / "nbctf_addresses.json"
 
+# A small committed DEMO table so the autonomous pipeline runs end-to-end with
+# ZERO secrets and no notebook run. Used only as a fallback when the real
+# notebook-produced MASTER_CSV is absent. Rows are real public reference-run /
+# NBCTF addresses and are flagged `demo=True`; every consumer that reads it
+# labels its output as DEMO so a sample can never be mistaken for a live lead.
+SAMPLE_MASTER_CSV = DATA_DIR / "sample_master.csv"
+
 for _d in (DATA_DIR, OUTPUTS_DIR, DOSSIERS_DIR):
     _d.mkdir(parents=True, exist_ok=True)
 
@@ -90,6 +97,23 @@ TOP_K_PER_CHAIN = int(_get("INVESTIGATOR_TOP_K", "25"))
 CHAINS = [c.strip() for c in _get("INVESTIGATOR_CHAINS", "ethereum,tron,bitcoin").split(",") if c.strip()]
 
 RESEARCH_LEAD_NOTICE = "Research lead - not a finding of guilt."
+
+
+def load_master():
+    """Load the triage master table, returning ``(DataFrame, is_demo)``.
+
+    Prefers the real notebook-produced ``MASTER_CSV``. When it is absent (e.g. a
+    fresh clone / CI run with no BigQuery), it falls back to the committed
+    ``SAMPLE_MASTER_CSV`` so the autonomous scan still runs end-to-end instead of
+    crashing. ``is_demo`` is True in that case so callers can label their output.
+    Returns an empty frame with ``is_demo=False`` if neither file exists.
+    """
+    import pandas as pd
+    if MASTER_CSV.exists():
+        return pd.read_csv(MASTER_CSV), False
+    if SAMPLE_MASTER_CSV.exists():
+        return pd.read_csv(SAMPLE_MASTER_CSV), True
+    return pd.DataFrame(), False
 
 
 def summary() -> dict:

@@ -37,7 +37,8 @@ from .adaptive_triage import FeatureBuilder, LinUCB, Reranker
 # Digest construction
 # ---------------------------------------------------------------------------
 def build_digest(master: pd.DataFrame, top_n_per_chain: int = 5,
-                 site_url: str | None = None, reranker: Reranker | None = None) -> dict:
+                 site_url: str | None = None, reranker: Reranker | None = None,
+                 is_demo: bool = False) -> dict:
     """Return {'text_html', 'text_plain', 'n_leads'} for the top leads."""
     site_url = site_url or os.environ.get("INVESTIGATOR_SITE_URL", "").rstrip("/")
     if reranker is None:
@@ -50,9 +51,11 @@ def build_digest(master: pd.DataFrame, top_n_per_chain: int = 5,
     if not chains:
         chains = sorted(master["chain"].dropna().unique().tolist()) if "chain" in master else []
 
-    html_lines = [f"<b>AML Investigator digest</b>",
+    demo_html = ["⚠️ <b>DEMO DATA</b> - sample table, not a real BigQuery run.", ""] if is_demo else []
+    demo_plain = ["[DEMO DATA] sample table, not a real BigQuery run.", ""] if is_demo else []
+    html_lines = [f"<b>AML Investigator digest</b>", *demo_html,
                   f"<i>Order: {order_kind}. Research leads only, not findings of guilt.</i>", ""]
-    plain_lines = ["AML Investigator digest",
+    plain_lines = ["AML Investigator digest", *demo_plain,
                    f"Order: {order_kind}. Research leads only.", ""]
     total = 0
     for chain in chains:
@@ -171,13 +174,15 @@ def notify(master: pd.DataFrame | None = None, channel: str | None = None,
            top_n_per_chain: int = 5, site_url: str | None = None) -> dict:
     """Build the digest and send it on the chosen channel (default: telegram)."""
     channel = (channel or os.environ.get("NOTIFY_CHANNEL", "telegram")).lower()
+    is_demo = False
     if master is None:
-        master = pd.read_csv(C.MASTER_CSV) if C.MASTER_CSV.exists() else pd.DataFrame()
+        master, is_demo = C.load_master()
     if not len(master):
         print("[notify] no master table; nothing to send.")
         return {"sent": False, "reason": "no_master"}
 
-    digest = build_digest(master, top_n_per_chain=top_n_per_chain, site_url=site_url)
+    digest = build_digest(master, top_n_per_chain=top_n_per_chain, site_url=site_url,
+                          is_demo=is_demo)
     if channel == "telegram":
         res = send_telegram(digest["text_html"])
     elif channel == "email":

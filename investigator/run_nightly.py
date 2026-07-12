@@ -28,15 +28,23 @@ from .agent import Investigator
 from .llm_client import LLMClient
 
 
-def _load_master() -> pd.DataFrame:
-    if not C.MASTER_CSV.exists():
-        raise FileNotFoundError(f"master not found: {C.MASTER_CSV}. Run the notebook first.")
-    return pd.read_csv(C.MASTER_CSV)
+def _load_master() -> tuple:
+    """Return ``(DataFrame, is_demo)``; falls back to the committed demo sample
+    when the notebook-produced master is absent, so CI never crashes."""
+    master, is_demo = C.load_master()
+    if not len(master):
+        raise FileNotFoundError(
+            f"no master found: neither {C.MASTER_CSV} nor {C.SAMPLE_MASTER_CSV} "
+            f"exists. Run the notebook to produce the master table.")
+    return master, is_demo
 
 
 def run(top_k: int | None = None, chains: list | None = None,
         provider: str | None = None, force: bool = False, verbose: bool = True) -> dict:
-    master = _load_master()
+    master, is_demo = _load_master()
+    if is_demo and verbose:
+        print("[nightly] NOTE: real master not found - using committed DEMO sample "
+              "(investigator/data/sample_master.csv). Output is labelled DEMO.")
     top_k = top_k or C.TOP_K_PER_CHAIN
     chains = chains or C.CHAINS
 
@@ -93,7 +101,7 @@ def run(top_k: int | None = None, chains: list | None = None,
         "reranker_active": reranker.active(),
         "top_k_per_chain": top_k, "chains": chains,
         "bq_spent_total_usd": round(bq_spent_total, 4),
-        "halted_by_kill_switch": halted,
+        "halted_by_kill_switch": halted, "demo": is_demo,
         "n_dossiers": len(entries), "entries": entries,
     }
     C.DOSSIER_INDEX_PATH.write_text(json.dumps(index, indent=2, default=str), encoding="utf-8")
@@ -129,6 +137,7 @@ th{{color:#8b949e;text-transform:uppercase;font-size:10.5px;}}
 a{{color:#58a6ff;text-decoration:none;}} code{{font-size:12px;}}
 </style></head><body>
 <h1>Investigator dossiers</h1>
+{'<div style="background:#3d2b00;border:1px solid #d29922;color:#f0c674;padding:8px 12px;border-radius:6px;margin:8px 0;font-size:13px;">DEMO DATA - built from the committed sample table (no real BigQuery run). Add BQ + LLM keys for live leads.</div>' if index.get('demo') else ''}
 <div class="muted">Generated {escape(index['generated'])} - provider {escape(index['provider'])}/{escape(index['model'])} -
 reranker {'active' if index['reranker_active'] else 'static'} -
 BQ ${index['bq_spent_total_usd']}{' - HALTED (kill-switch)' if index['halted_by_kill_switch'] else ''}.

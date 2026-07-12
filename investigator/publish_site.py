@@ -142,6 +142,10 @@ def build(dossiers_dir: Path | None = None, site_dir: Path | None = None) -> dic
         except Exception:
             meta = {}
     gen = meta.get("generated", "")
+    demo_banner = ('<div style="background:#3d2b00;border:1px solid #d29922;color:#f0c674;'
+                   'padding:8px 12px;border-radius:6px;margin:8px 0;font-size:13px;">'
+                   'DEMO DATA - built from the committed sample table (no real BigQuery run). '
+                   'Add BQ + LLM keys for live leads.</div>') if meta.get("demo") else ""
     sections = []
     by_chain: dict = {}
     for e in entries:
@@ -151,7 +155,7 @@ def build(dossiers_dir: Path | None = None, site_dir: Path | None = None) -> dic
             f'<div class="card"><a href="{e["href"]}"><code>{html.escape(e["address"])}</code></a></div>'
             for e in by_chain[chain])
         sections.append(f"<h2>{html.escape(chain)} ({len(by_chain[chain])})</h2>{cards}")
-    body = (f"<h1>AML Investigator dossiers</h1>"
+    body = (f"<h1>AML Investigator dossiers</h1>{demo_banner}"
             f"<p class='muted'>{'Generated ' + html.escape(gen) + '. ' if gen else ''}"
             f"{len(entries)} dossiers. Research leads only, not findings of guilt.</p>"
             + ("".join(sections) if sections else "<p class='muted'>No dossiers yet.</p>"))
