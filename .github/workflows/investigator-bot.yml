@@ -1,0 +1,43 @@
+name: Investigator bot poll
+
+# Two-way Telegram bot on GitHub Actions cron: every 5 min this job calls
+# Telegram's getUpdates, dispatches each user command in the whitelisted chat,
+# and replies. Free tier only (public repo -> unlimited Actions minutes).
+
+on:
+  schedule:
+    - cron: "*/5 * * * *"    # every 5 minutes
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# Two poll cycles must never race - if one takes longer than 5 min the next
+# is canceled and the offset ack in the running cycle still covers it.
+concurrency:
+  group: investigator-bot-poll
+  cancel-in-progress: true
+
+jobs:
+  poll:
+    runs-on: ubuntu-latest
+    env:
+      TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+      TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+      INVESTIGATOR_SITE_URL: ${{ vars.INVESTIGATOR_SITE_URL }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install -r investigator/requirements.txt
+
+      - name: Poll and dispatch commands
+        run: python -m investigator.bot

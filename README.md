@@ -138,6 +138,36 @@ country only, tabs for Candidates / Plots / Drilldown / Bridges / Geo / Report /
 
 ---
 
+## Autonomous investigator layer
+
+An optional layer on top of the detection pipeline (folder [`investigator/`](investigator/)) that keeps
+running when the researcher's laptop is closed. The base project is untouched; the layer only reads it.
+
+- **A ReAct investigator agent** over 7 budgeted tools (`graph_expand`, `enrich`, `detect_mixer`,
+  `detect_bridge`, `search_ofac`, `search_nbctf`, `write_case_note`) that writes a cited markdown
+  dossier per wallet under strict per-run budgets (BigQuery dollars, LLM tokens, hops, tool calls).
+  Every claim in a dossier anchors to a `[TOOL:n]` observation in the reasoning trace.
+- **Adaptive triage** - an online LinUCB reranker fed by analyst verdicts, warm-started weekly by an
+  XGBoost pairwise LTR pass. Feature flag off -> queue stays on the static `actionability` order.
+- **Autonomous delivery** - a GitHub Actions cron scan (twice a day) writes dossiers, publishes them to
+  **GitHub Pages**, and pushes a digest to a **Telegram bot**. Runs with zero secrets on committed
+  data; add secrets to turn it into a live BigQuery + LLM run. Detailed setup in Hebrew:
+  [`investigator/SETUP_TELEGRAM.he.md`](investigator/SETUP_TELEGRAM.he.md).
+- **Two-way Telegram bot** - poll-based (no webhook, no server): a second Actions workflow polls every
+  5 minutes and responds to commands from the whitelisted chat.
+
+  | Command | What it does |
+  |---|---|
+  | `/scan` | current top-3-per-chain digest |
+  | `/top [chain] [N]` | top-N leads for one chain (default: ethereum, 10) |
+  | `/wallet <address>` | details for one wallet from the master table |
+  | `/stats` | dataset stats |
+  | `/help` | list commands |
+
+Full API + provider + LLM knobs are in [`investigator/README.md`](investigator/README.md).
+
+---
+
 ## Responsible use
 
 A high fan-in / low fan-out pattern, a mixer signature, a campaign-shaped inflow, a bridge-wallet

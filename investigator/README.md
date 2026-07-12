@@ -84,6 +84,25 @@ With `provider=mock`: **$0** (offline). Real runs are bounded per dossier by the
 budgets above (~$0.10 BigQuery + a few cents of Haiku tokens) and per batch by
 the daily kill-switch. Component B (LinUCB/XGBoost) is local compute only.
 
+## Two-way Telegram bot
+
+A second workflow (`.github/workflows/investigator-bot.yml`) polls Telegram
+every 5 minutes and dispatches commands from the whitelisted chat. No webhook,
+no server - runs on the same free tier as the scan. Anything from other chats
+is silently ignored.
+
+| Command | Effect |
+|---|---|
+| `/scan` | current top-3-per-chain digest built from the master table |
+| `/top [chain] [N]` | top-N leads for one chain (default: ethereum, 10; N up to 25) |
+| `/wallet <address>` | details for one wallet from the master |
+| `/stats` | row counts per chain + max actionability + signal counts |
+| `/help`, `/start` | list of commands |
+
+Latency: up to 5 min (cron interval; GitHub can add a few more minutes at peak).
+Persistence: none - the bot uses Telegram's native offset acknowledgement, so
+Telegram holds unprocessed messages for 24 h and re-delivers them next poll.
+
 ## Phone delivery (runs even when your PC is off)
 
 The scan runs on **GitHub Actions** (free, always-on cron), publishes dossiers to
