@@ -32,13 +32,14 @@ from html import escape
 import pandas as pd
 
 from . import config as C
-from .notify import _api, build_digest, send_telegram
+from .notify import _api, build_digest, send_telegram, send_telegram_document
 
 _COMMANDS_HELP = (
     "<b>AML Investigator bot</b>\n"
     "Research leads only, not findings of guilt.\n\n"
     "<b>Commands</b>\n"
-    "/scan               top leads across chains\n"
+    "/report             full PDF report + master CSV (as attachments)\n"
+    "/scan               top leads across chains (text digest)\n"
     "/top [chain] [N]    top-N for one chain (default: ethereum 10)\n"
     "/wallet &lt;addr&gt;      details for one wallet\n"
     "/stats              dataset stats\n"
@@ -149,9 +150,52 @@ def _cmd_stats(_arg: str) -> str:
     return "\n".join(lines)
 
 
+def _cmd_report(_arg: str) -> str:
+    """Build report.pdf from report.html and send it + the master CSV as
+    Telegram documents. Returns a short status message that the poll loop
+    then sends as a normal text reply."""
+    chat_id = os.environ.get("TELEGRAM_CHAT_ID", "").strip()
+
+    # 1) PDF
+    pdf_status = ""
+    try:
+        from .report_pdf import build_pdf
+        pdf_path = build_pdf()
+        r = send_telegram_document(
+            pdf_path,
+            caption=("<b>AML Investigator - full report</b>\n"
+                     "Research leads only, not findings of guilt."),
+            chat_id=chat_id)
+        pdf_status = ("PDF sent (%d KB)" % (pdf_path.stat().st_size // 1024)
+                      if r.get("sent") else f"PDF failed: {r.get('reason')}")
+    except FileNotFoundError:
+        pdf_status = "PDF skipped: report.html not on repo (run cell 13.6 and push)"
+    except ImportError as e:
+        pdf_status = f"PDF skipped: {e}"
+    except Exception as e:
+        pdf_status = f"PDF failed: {type(e).__name__}: {e}"
+
+    # 2) CSV
+    csv_status = ""
+    if C.MASTER_CSV.exists():
+        r = send_telegram_document(
+            C.MASTER_CSV,
+            caption=("<b>Master CSV</b>\n"
+                     "Full ranked pool of suspicious wallets for follow-up "
+                     "investigation."),
+            chat_id=chat_id)
+        csv_status = ("CSV sent (%d KB)" % (C.MASTER_CSV.stat().st_size // 1024)
+                      if r.get("sent") else f"CSV failed: {r.get('reason')}")
+    else:
+        csv_status = "CSV skipped: no master on repo"
+
+    return f"<b>/report</b>\n{pdf_status}\n{csv_status}"
+
+
 _HANDLERS = {
     "/start":  lambda _a: _COMMANDS_HELP,
     "/help":   lambda _a: _COMMANDS_HELP,
+    "/report": _cmd_report,
     "/scan":   _cmd_scan,
     "/top":    _cmd_top,
     "/wallet": _cmd_wallet,

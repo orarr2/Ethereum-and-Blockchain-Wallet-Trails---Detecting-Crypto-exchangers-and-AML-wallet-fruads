@@ -33,6 +33,13 @@ jobs:
           python-version: "3.11"
           cache: pip
 
+      - name: Install PDF renderer system libraries (weasyprint)
+        # needed by the /report command so we can build the PDF on demand
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            libpango-1.0-0 libpangoft2-1.0-0 libcairo2 libgdk-pixbuf-2.0-0 libffi-dev
+
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip

@@ -5,6 +5,7 @@
 anthropic>=0.40.0        # default LLM provider (Component A). Not needed for provider=mock.
 xgboost>=2.0.0           # offline pairwise LTR warm-start (Component B). Optional; degrades gracefully.
 jsonschema>=4.21.0       # tool I/O validation. Optional; falls back to a required-key check.
+weasyprint>=61.0         # HTML->PDF rendering for the delivered report (needs cairo/pango system libs in CI).
 
 # openai is NOT pinned here: only needed if you switch INVESTIGATOR_LLM_PROVIDER=openai.
 # pip install openai

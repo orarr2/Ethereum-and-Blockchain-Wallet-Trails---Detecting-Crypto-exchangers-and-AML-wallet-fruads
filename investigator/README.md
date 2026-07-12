@@ -93,11 +93,17 @@ is silently ignored.
 
 | Command | Effect |
 |---|---|
+| `/report` | full PDF report (from `report.html`) + master CSV as document attachments |
 | `/scan` | current top-3-per-chain digest built from the master table |
 | `/top [chain] [N]` | top-N leads for one chain (default: ethereum, 10; N up to 25) |
 | `/wallet <address>` | details for one wallet from the master |
 | `/stats` | row counts per chain + max actionability + signal counts |
 | `/help`, `/start` | list of commands |
+
+Every scheduled scan also attaches the PDF and the CSV to the digest, so the
+phone receives a real professional deliverable and a ranked pool for follow-up.
+The PDF is built by wrapping the notebook-produced `report.html` with
+`weasyprint` - no content is re-authored, only the delivery format changes.
 
 Latency: up to 5 min (cron interval; GitHub can add a few more minutes at peak).
 Persistence: none - the bot uses Telegram's native offset acknowledgement, so

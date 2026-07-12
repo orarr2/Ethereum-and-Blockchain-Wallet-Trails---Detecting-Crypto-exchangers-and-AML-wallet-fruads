@@ -22,11 +22,14 @@ stdout and the function returns cleanly (so CI logs still show what would send).
 from __future__ import annotations
 
 import json
+import mimetypes
 import os
+import secrets
 import urllib.error
 import urllib.parse
 import urllib.request
 from html import escape
+from pathlib import Path
 
 import pandas as pd
 
@@ -159,6 +162,64 @@ def preflight_telegram(token: str | None = None, chat_id: str | None = None) -> 
     return out
 
 
+def _multipart_body(fields: dict, files: dict) -> tuple:
+    """Build a multipart/form-data body with stdlib only.
+      fields: {name: str}
+      files:  {name: (filename, bytes, content_type)}
+    Returns (body_bytes, content_type_header).
+    """
+    boundary = "----investigator" + secrets.token_hex(8)
+    body = b""
+    for name, value in fields.items():
+        body += f"--{boundary}\r\n".encode()
+        body += f'Content-Disposition: form-data; name="{name}"\r\n\r\n'.encode()
+        body += str(value).encode("utf-8") + b"\r\n"
+    for name, (filename, data, ctype) in files.items():
+        body += f"--{boundary}\r\n".encode()
+        body += (f'Content-Disposition: form-data; name="{name}"; '
+                 f'filename="{filename}"\r\n').encode()
+        body += f"Content-Type: {ctype}\r\n\r\n".encode()
+        body += data + b"\r\n"
+    body += f"--{boundary}--\r\n".encode()
+    return body, f"multipart/form-data; boundary={boundary}"
+
+
+def send_telegram_document(path, caption: str = "", token: str | None = None,
+                           chat_id: str | None = None) -> dict:
+    """Upload a file to the whitelisted chat via Telegram sendDocument.
+    Returns {sent, response, reason}. Caption is limited to 1024 chars by
+    Telegram; anything longer is truncated. Files up to 50MB are accepted."""
+    token = (token or os.environ.get("TELEGRAM_BOT_TOKEN", "")).strip()
+    chat_id = (chat_id or os.environ.get("TELEGRAM_CHAT_ID", "")).strip()
+    if not token or not chat_id:
+        return {"sent": False, "reason": "no_credentials"}
+    path = Path(path)
+    if not path.exists():
+        return {"sent": False, "reason": f"file_not_found:{path}"}
+    data = path.read_bytes()
+    ctype = mimetypes.guess_type(path.name)[0] or "application/octet-stream"
+    body, content_type = _multipart_body(
+        {"chat_id": chat_id, "caption": (caption or "")[:1024], "parse_mode": "HTML"},
+        {"document": (path.name, data, ctype)},
+    )
+    url = f"https://api.telegram.org/bot{token}/sendDocument"
+    try:
+        req = urllib.request.Request(url, data=body,
+                                     headers={"Content-Type": content_type})
+        with urllib.request.urlopen(req, timeout=60) as r:
+            resp = json.loads(r.read().decode("utf-8", errors="replace"))
+    except urllib.error.HTTPError as e:
+        try:
+            resp = json.loads(e.read().decode("utf-8", errors="replace"))
+        except Exception:
+            resp = {"ok": False, "description": f"HTTPError {e.code}"}
+    except Exception as e:
+        return {"sent": False, "reason": f"{type(e).__name__}: {e}"}
+    ok = bool(resp.get("ok"))
+    return {"sent": ok, "response": resp,
+            "reason": "" if ok else resp.get("description", "unknown")}
+
+
 def send_telegram(text_html: str, token: str | None = None, chat_id: str | None = None) -> dict:
     token = (token or os.environ.get("TELEGRAM_BOT_TOKEN", "")).strip()
     chat_id = (chat_id or os.environ.get("TELEGRAM_CHAT_ID", "")).strip()
@@ -244,7 +305,42 @@ def notify(master: pd.DataFrame | None = None, channel: str | None = None,
     if not res.get("sent") and "response" in res:
         # surface the API's own words - useful when the reason is truncated
         print(f"[notify] telegram api response: {res['response']}")
+
+    # Attach the full report (PDF) + master CSV so the phone gets a real,
+    # standalone deliverable, not just a bullet list. Silently skip when the
+    # channel is not telegram, when creds are missing, or when the PDF build
+    # fails (weasyprint absent locally, etc.) - the text digest is enough.
+    if channel == "telegram" and res.get("sent"):
+        _attach_report_and_csv(digest["n_leads"])
     return res
+
+
+def _attach_report_and_csv(n_leads: int) -> None:
+    """Send report.pdf + suspicious_wallets_master.csv as Telegram documents.
+    Best-effort: any failure prints a line but does not crash the notify step."""
+    pdf_path = None
+    try:
+        from .report_pdf import build_pdf
+        pdf_path = build_pdf()
+    except Exception as e:
+        print(f"[notify] pdf build skipped: {type(e).__name__}: {e}")
+
+    if pdf_path is not None:
+        r = send_telegram_document(
+            pdf_path,
+            caption=(f"<b>AML Investigator - full report</b>\n"
+                     f"KPI cards, top-50 actionable leads, bridge wallets, "
+                     f"country breakdown, exchange anchors, NBCTF matches. "
+                     f"Research leads only, not findings of guilt."))
+        print(f"[notify] pdf sent={r.get('sent')} reason={r.get('reason')!r}")
+
+    if C.MASTER_CSV.exists():
+        r = send_telegram_document(
+            C.MASTER_CSV,
+            caption=(f"<b>Master CSV</b> - {n_leads or '?'} top leads shown above; "
+                     f"this file has the full ranked pool for your own follow-up "
+                     f"investigation."))
+        print(f"[notify] csv sent={r.get('sent')} reason={r.get('reason')!r}")
 
 
 if __name__ == "__main__":  # pragma: no cover

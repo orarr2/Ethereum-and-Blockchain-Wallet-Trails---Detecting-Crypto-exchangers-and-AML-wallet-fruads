@@ -158,11 +158,17 @@ running when the researcher's laptop is closed. The base project is untouched; t
 
   | Command | What it does |
   |---|---|
+  | `/report` | full PDF report + master CSV (as attachments) |
   | `/scan` | current top-3-per-chain digest |
   | `/top [chain] [N]` | top-N leads for one chain (default: ethereum, 10) |
   | `/wallet <address>` | details for one wallet from the master table |
   | `/stats` | dataset stats |
   | `/help` | list commands |
+
+  Every scheduled scan **also attaches** the standalone PDF (built from the
+  notebook-produced `report.html` - the same content as the Streamlit report
+  tab) and the full master CSV, so the phone receives a real deliverable, not
+  only a bullet list.
 
 Full API + provider + LLM knobs are in [`investigator/README.md`](investigator/README.md).
 
