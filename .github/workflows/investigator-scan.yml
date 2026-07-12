@@ -66,6 +66,19 @@ jobs:
           pip install -r requirements.txt
           pip install -r investigator/requirements.txt
 
+      - name: Preflight Telegram secrets
+        # Fail FAST when the token/chat_id don't work, so we never again get a
+        # green run that quietly delivered nothing. Calls Telegram's own
+        # getMe + getChat and echoes exactly which secret is wrong.
+        # Exit codes:
+        #   0 - both secrets valid (send will work), OR both unset (dry-run OK)
+        #   1 - a secret IS set but Telegram rejected it (naming exactly which)
+        run: |
+          python -c "from investigator.notify import preflight_telegram; \
+            import json,sys; r=preflight_telegram(); \
+            print('[preflight]', json.dumps(r)); \
+            sys.exit(0 if r['ok'] or 'missing' in r['problem'] else 1)"
+
       - name: Configure BigQuery auth (optional)
         if: env.HAS_GCP == 'true'
         env:

@@ -23,6 +23,7 @@ from __future__ import annotations
 
 import json
 import os
+import urllib.error
 import urllib.parse
 import urllib.request
 from html import escape
@@ -37,8 +38,7 @@ from .adaptive_triage import FeatureBuilder, LinUCB, Reranker
 # Digest construction
 # ---------------------------------------------------------------------------
 def build_digest(master: pd.DataFrame, top_n_per_chain: int = 5,
-                 site_url: str | None = None, reranker: Reranker | None = None,
-                 is_demo: bool = False) -> dict:
+                 site_url: str | None = None, reranker: Reranker | None = None) -> dict:
     """Return {'text_html', 'text_plain', 'n_leads'} for the top leads."""
     site_url = site_url or os.environ.get("INVESTIGATOR_SITE_URL", "").rstrip("/")
     if reranker is None:
@@ -51,11 +51,9 @@ def build_digest(master: pd.DataFrame, top_n_per_chain: int = 5,
     if not chains:
         chains = sorted(master["chain"].dropna().unique().tolist()) if "chain" in master else []
 
-    demo_html = ["⚠️ <b>DEMO DATA</b> - sample table, not a real BigQuery run.", ""] if is_demo else []
-    demo_plain = ["[DEMO DATA] sample table, not a real BigQuery run.", ""] if is_demo else []
-    html_lines = [f"<b>AML Investigator digest</b>", *demo_html,
+    html_lines = [f"<b>AML Investigator digest</b>",
                   f"<i>Order: {order_kind}. Research leads only, not findings of guilt.</i>", ""]
-    plain_lines = ["AML Investigator digest", *demo_plain,
+    plain_lines = ["AML Investigator digest",
                    f"Order: {order_kind}. Research leads only.", ""]
     total = 0
     for chain in chains:
@@ -107,26 +105,76 @@ def _flags(row) -> str:
 # ---------------------------------------------------------------------------
 # Channels
 # ---------------------------------------------------------------------------
+def _api(token: str, method: str, params: dict | None = None) -> dict:
+    """Call a Telegram Bot API method and ALWAYS return the parsed response,
+    even on 4xx (so `description` reaches the caller instead of being lost in
+    a generic HTTPError). Redacts token when raising."""
+    url = f"https://api.telegram.org/bot{token}/{method}"
+    data = urllib.parse.urlencode(params or {}).encode()
+    try:
+        req = urllib.request.Request(url, data=data)
+        with urllib.request.urlopen(req, timeout=30) as r:
+            body = r.read().decode("utf-8", errors="replace")
+    except urllib.error.HTTPError as e:
+        # Telegram returns useful JSON even on 4xx - read it
+        try:
+            body = e.read().decode("utf-8", errors="replace")
+        except Exception:
+            body = f'{{"ok":false,"description":"HTTPError {e.code}"}}'
+    except Exception as e:
+        return {"ok": False, "description": f"{type(e).__name__}: {e}"}
+    try:
+        return json.loads(body)
+    except json.JSONDecodeError:
+        return {"ok": False, "description": f"non-JSON response: {body[:200]}"}
+
+
+def preflight_telegram(token: str | None = None, chat_id: str | None = None) -> dict:
+    """Prove BOTH secrets are valid before we build a digest.
+      * getMe    - proves the token opens a real bot.
+      * getChat  - proves the chat_id is one the bot can talk to.
+    Returns {ok, bot_name, chat_kind, problem} - `problem` is empty on success
+    and names the exact broken piece otherwise."""
+    token = (token or os.environ.get("TELEGRAM_BOT_TOKEN", "")).strip()
+    chat_id = (chat_id or os.environ.get("TELEGRAM_CHAT_ID", "")).strip()
+    out = {"ok": False, "bot_name": "", "chat_kind": "", "problem": ""}
+    if not token:
+        out["problem"] = "TELEGRAM_BOT_TOKEN secret is missing or empty"
+        return out
+    if not chat_id:
+        out["problem"] = "TELEGRAM_CHAT_ID secret is missing or empty"
+        return out
+    me = _api(token, "getMe")
+    if not me.get("ok"):
+        out["problem"] = f"getMe failed - TELEGRAM_BOT_TOKEN is invalid ({me.get('description','?')})"
+        return out
+    out["bot_name"] = (me.get("result") or {}).get("username", "?")
+    chat = _api(token, "getChat", {"chat_id": chat_id})
+    if not chat.get("ok"):
+        out["problem"] = (f"getChat failed - TELEGRAM_CHAT_ID is invalid or the bot "
+                          f"has not been messaged from this chat ({chat.get('description','?')})")
+        return out
+    out["chat_kind"] = (chat.get("result") or {}).get("type", "?")
+    out["ok"] = True
+    return out
+
+
 def send_telegram(text_html: str, token: str | None = None, chat_id: str | None = None) -> dict:
-    token = token or os.environ.get("TELEGRAM_BOT_TOKEN", "")
-    chat_id = chat_id or os.environ.get("TELEGRAM_CHAT_ID", "")
+    token = (token or os.environ.get("TELEGRAM_BOT_TOKEN", "")).strip()
+    chat_id = (chat_id or os.environ.get("TELEGRAM_CHAT_ID", "")).strip()
     if not token or not chat_id:
-        print("[notify] TELEGRAM_BOT_TOKEN/CHAT_ID not set - dry run. Message:\n")
+        which = "BOTH" if not token and not chat_id else ("TOKEN" if not token else "CHAT_ID")
+        print(f"[notify] TELEGRAM {which} secret missing - dry run. Message:\n")
         print(text_html)
-        return {"sent": False, "reason": "no_credentials"}
-    # Telegram hard limit is 4096 chars per message
-    text = text_html[:4000]
-    url = f"https://api.telegram.org/bot{token}/sendMessage"
-    data = urllib.parse.urlencode({
+        return {"sent": False, "reason": f"no_credentials:{which}"}
+    text = text_html[:4000]   # Telegram hard limit is 4096 chars
+    resp = _api(token, "sendMessage", {
         "chat_id": chat_id, "text": text, "parse_mode": "HTML",
         "disable_web_page_preview": "true",
-    }).encode()
-    try:
-        with urllib.request.urlopen(urllib.request.Request(url, data=data), timeout=30) as r:
-            resp = json.load(r)
-        return {"sent": bool(resp.get("ok")), "response": resp}
-    except Exception as e:
-        return {"sent": False, "reason": f"{type(e).__name__}: {e}"}
+    })
+    ok = bool(resp.get("ok"))
+    return {"sent": ok, "response": resp,
+            "reason": ("" if ok else resp.get("description", "unknown"))}
 
 
 def send_email(subject: str, text_plain: str) -> dict:
@@ -174,15 +222,13 @@ def notify(master: pd.DataFrame | None = None, channel: str | None = None,
            top_n_per_chain: int = 5, site_url: str | None = None) -> dict:
     """Build the digest and send it on the chosen channel (default: telegram)."""
     channel = (channel or os.environ.get("NOTIFY_CHANNEL", "telegram")).lower()
-    is_demo = False
     if master is None:
-        master, is_demo = C.load_master()
+        master = pd.read_csv(C.MASTER_CSV) if C.MASTER_CSV.exists() else pd.DataFrame()
     if not len(master):
         print("[notify] no master table; nothing to send.")
         return {"sent": False, "reason": "no_master"}
 
-    digest = build_digest(master, top_n_per_chain=top_n_per_chain, site_url=site_url,
-                          is_demo=is_demo)
+    digest = build_digest(master, top_n_per_chain=top_n_per_chain, site_url=site_url)
     if channel == "telegram":
         res = send_telegram(digest["text_html"])
     elif channel == "email":
@@ -192,9 +238,20 @@ def notify(master: pd.DataFrame | None = None, channel: str | None = None,
     else:
         raise ValueError(f"unknown NOTIFY_CHANNEL={channel!r}")
     res["n_leads"] = digest["n_leads"]
-    print(f"[notify] channel={channel} sent={res.get('sent')} leads={digest['n_leads']}")
+    reason = res.get("reason", "")
+    print(f"[notify] channel={channel} sent={res.get('sent')} leads={digest['n_leads']}"
+          + (f" reason={reason!r}" if reason else ""))
+    if not res.get("sent") and "response" in res:
+        # surface the API's own words - useful when the reason is truncated
+        print(f"[notify] telegram api response: {res['response']}")
     return res
 
 
 if __name__ == "__main__":  # pragma: no cover
-    notify()
+    import sys
+    res = notify()
+    # Exit non-zero when creds ARE set but the message wasn't delivered - so the
+    # CI step turns red and stops lying that a silent failure was a success. If
+    # credentials are missing (no_credentials), stay green - that is a dry-run.
+    if not res.get("sent") and not str(res.get("reason", "")).startswith("no_credentials"):
+        sys.exit(1)
