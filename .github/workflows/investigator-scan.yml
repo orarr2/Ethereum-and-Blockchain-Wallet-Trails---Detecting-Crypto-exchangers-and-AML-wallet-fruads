@@ -9,8 +9,13 @@ name: Investigator scan
 
 on:
   schedule:
-    - cron: "0 6 * * *"    # 06:00 UTC (~09:00 Israel)
-    - cron: "0 18 * * *"   # 18:00 UTC (~21:00 Israel)
+    # GitHub Actions cron is UTC only (no tz support). Israel = UTC+3 in
+    # summer (IDT) / UTC+2 in winter (IST). These offsets target IDT so the
+    # push arrives at 12:00 and 20:00 Israel time in summer. In winter the
+    # arrival shifts one hour earlier (11:00 and 19:00 IST) - adjust the
+    # hours below if you want winter to be exact instead.
+    - cron: "0 9 * * *"    # 09:00 UTC = 12:00 IDT / 11:00 IST
+    - cron: "0 17 * * *"   # 17:00 UTC = 20:00 IDT / 19:00 IST
   workflow_dispatch:        # manual "Run workflow" button
     inputs:
       top_k:
