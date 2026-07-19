@@ -1,76 +1,76 @@
 ﻿wallet,chain,risk_score,actionability,campaign_terror_score,is_top_campaign_lead,risk_categories,risk_tags,distinct_senders,distinct_recipients,funnel_ratio_recipients,funnel_ratio_out_cnt,is_single_recipient,country_codes,hits_interesting_country,anchor_exchange,anchor_usdt
-0xad285fdedfc0d5f944a33e478356524293c7ec68,ethereum,68.2,93.2,71.5,True,[],[],2469,5,493.8,493.8,False,"['AE', 'GLOBAL', 'MT']",True,Binance 15,49832.919713
+0xad285fdedfc0d5f944a33e478356524293c7ec68,ethereum,68.0,93.0,71.4,True,[],[],2469,5,493.8,493.8,False,"['AE', 'GLOBAL', 'MT']",True,Binance 15,49832.919713
 0x7af4a738b30775a836a050a4c85f4c58689aed38,ethereum,76.3,76.3,71.4,True,[],[],2907,23,126.39,126.39,False,[],False,,0.0
-0xf8cd17784f425120de2f0d65756d8a707c13d040,ethereum,45.2,70.2,88.6,True,[],[],207,0,207.0,207.0,True,"['AE', 'GLOBAL', 'MT']",True,Binance 16,51793.173258
-0xe65b1448e8e7bf9dc799945cf18c8394104b3537,tron,69.5,69.5,95.2,True,[],[],1878,1,1878.0,78.25,True,[],False,,0.0
-0x186b8b2ae81def818ccb8408861ce648595ae234,ethereum,68.4,68.4,91.0,True,[],[],615,0,615.0,615.0,True,[],False,,0.0
-0xd4b13bad3b585c1786a86c9527909fdb879f685c,tron,67.2,67.2,91.1,True,[],[],1341,1,1341.0,121.91,True,[],False,,0.0
-0x9837ab290fb9b91951199da7b114fbbb4706d245,tron,66.8,66.8,95.4,True,[],[],1385,1,1385.0,62.95,True,[],False,,0.0
-0xd9fcd35ebcf3f404fcb4693deb325497636d947f,tron,66.6,66.6,93.8,True,[],[],441,0,441.0,441.0,True,[],False,,0.0
-0x970775693b164145e6ce9d092f97555cfe89e6f9,tron,65.9,65.9,93.2,True,[],[],1253,1,1253.0,208.83,True,[],False,,0.0
-0x92ea49b6e51de747f6cec1b4e07c78ce4bd72bc6,ethereum,40.1,65.1,87.7,True,[],[],259,1,259.0,10.79,True,"['AE', 'GLOBAL', 'MT']",True,Binance 14,20843.591382
-0x9f006a5328d2f5fd44bbb728168620ba60863a70,ethereum,63.2,63.2,84.8,True,[],[],570,0,570.0,570.0,True,[],False,,0.0
-0xd288dbf263e54c6950484d0190684f80b8d9d734,ethereum,38.2,63.2,72.4,True,[],[],91,1,91.0,91.0,True,"['AE', 'GLOBAL', 'MT']",True,Binance 16,30.0
-0x8fe0ed7219253ba556443eb7e798dc996704b5e0,ethereum,37.2,62.2,76.7,True,[],[],162,1,162.0,12.46,True,"['AE', 'GLOBAL', 'MT']",True,Binance 18,2066.5072
-0xd1fc584ed96ed22a10e26eeff3bd7da50f0e5978,tron,62.1,62.1,94.2,True,[],[],926,1,926.0,231.5,True,[],False,,0.0
-bc1qj9cu7kul0wvvxe4uuay05mwuewzdz0nv5v8hkl,bitcoin,60.2,60.2,100.0,True,[],[],3542,0,3542.0,147.58,True,[],False,,0.0
-0x8713173887299b893e17d98a473444cf19b28779,tron,59.4,59.4,95.1,True,[],[],638,1,638.0,638.0,True,[],False,,0.0
-bc1qlck5stwval5t0t4k2peerv757xalyvl3df4p8s,bitcoin,59.1,59.1,99.6,True,[],[],1292,0,1292.0,646.0,True,[],False,,0.0
-bc1qthg00j0p3tmp7ev3ut8535492lurc7g06ended,bitcoin,58.7,58.7,99.9,True,[],[],2812,0,2812.0,165.41,True,[],False,,0.0
-bc1qpqv6qa6jngqc6wz2dcmxh2f74qxycktedayd2g,bitcoin,57.3,57.3,99.5,True,[],[],915,0,915.0,61.0,True,[],False,,0.0
-0x2b9962048a732264579bb837adc56779de2e8949,ethereum,31.3,56.3,83.4,True,[],[],177,1,177.0,9.83,True,"['AE', 'GLOBAL', 'MT']",True,Binance 14,15297.528576
-bc1qtfcnuueaxzpwylug8vl9w6aexfv8j8342ks4xz,bitcoin,56.2,56.2,99.8,True,[],[],2176,0,2176.0,272.0,True,[],False,,0.0
-bc1qwctfjys6g2aj5tftk9gf2emqe4kmjwqrqecd8s,bitcoin,55.5,55.5,99.9,True,[],[],2651,0,2651.0,883.67,True,[],False,,0.0
-bc1pt5zrlm55lmfwq7sjsuzgpgkmm7fymkna375l8kyuu5p6cq77545q554mgr,bitcoin,54.8,54.8,99.9,True,[],[],2580,0,2580.0,2580.0,True,[],False,,0.0
-0xb08c35956defc2b017478cf8001c16ad0cbe1f1b,tron,54.7,54.7,94.4,True,[],[],477,1,477.0,477.0,True,[],False,,0.0
-0x75e6766af534f83d9a9f6d8448cb735473b8aa4c,ethereum,28.8,53.8,75.0,True,[],[],92,1,92.0,4.38,True,"['AE', 'GLOBAL', 'MT']",True,Binance 16,4183.633361
-0x2d3c7c3effff1dce08b8ac796e242f5f0c36ac47,ethereum,28.2,53.2,71.0,True,[],[],90,1,90.0,6.43,True,"['AE', 'GLOBAL', 'MT']",True,Binance 14,10745.990955
-bc1qfpk3v73mafh7ptz6q4nygjq4g5e6jud0mfw80s,bitcoin,53.0,53.0,99.7,True,[],[],1347,0,1347.0,1347.0,True,[],False,,0.0
-0x8358201b4339c47e29289093199b88576bd589e7,tron,53.0,53.0,94.4,True,[],[],562,1,562.0,562.0,True,[],False,,0.0
-bc1q4tqadq8d5h8qn996f9apnr63qelezyxhcnjan5,bitcoin,52.5,52.5,100.0,True,[],[],4086,0,4086.0,4086.0,True,[],False,,0.0
-bc1q4r4hcqvw70r37m7wpf7597nmvc7c9zrsp9x5c5,bitcoin,52.4,52.4,100.0,True,[],[],4484,0,4484.0,4484.0,True,[],False,,0.0
-0x7bba792bccebb458ea8c42dcbfac3c66dcf561ec,tron,52.2,52.2,91.0,True,[],[],209,0,209.0,209.0,True,[],False,,0.0
-bc1q58m3vyvkmcpfvdxq9gsztuezjn4putvv4cv4a4,bitcoin,52.0,52.0,99.8,True,[],[],1826,0,1826.0,1826.0,True,[],False,,0.0
-0x487445bc46ce5ba9918db8609a1928fbfa7382f4,ethereum,51.9,51.9,89.9,True,[],[],309,0,309.0,309.0,True,[],False,,0.0
-bc1qg4s6r2pm38hw5jezws85wcsd6np747at830lr3,bitcoin,51.7,51.7,99.9,True,[],[],3252,0,3252.0,813.0,True,[],False,,0.0
-0xb3a7748172bd0c89eb89921aad88338c3519aae2,tron,50.6,50.6,93.4,True,[],[],371,1,371.0,371.0,True,[],False,,0.0
-bc1q9l3yeasfcqu9wq23vptmqx389e4t277zpel4zu,bitcoin,49.6,49.6,99.6,True,[],[],1296,0,1296.0,432.0,True,[],False,,0.0
-bc1qpvsxc27np5tswzek6eevhflhnk8r2dm78wlwny,bitcoin,49.5,49.5,99.9,True,[],[],2661,0,2661.0,665.25,True,[],False,,0.0
-bc1q6zxlrcpz2ceecd5pvf8g4rt00pszf0qxpg92vd,bitcoin,49.4,49.4,99.7,True,[],[],1303,0,1303.0,217.17,True,[],False,,0.0
-0x5ca9d4614e5426212ded35fb40951c1dc47926d1,tron,49.1,49.1,90.6,True,[],[],580,1,580.0,72.5,True,[],False,,0.0
-0xeb187b6b15120eb3a6b09a0b73c6cd83ddb2c064,ethereum,48.6,48.6,91.1,True,[],[],320,1,320.0,320.0,True,[],False,,0.0
-0x96e74e1cd5edecfc7f90372b024e092d2b2eb644,tron,47.7,47.7,91.0,True,[],[],409,1,409.0,409.0,True,[],False,,0.0
-0x88a4f1f15052a64bda4d9c0108bfe771f9e0d5bc,tron,47.3,47.3,92.2,True,[],[],501,1,501.0,100.2,True,[],False,,0.0
-bc1q4kuugektk3232wnwzn5dy2s7a65njdq2dsda67,bitcoin,47.0,47.0,99.8,True,[],[],2117,0,2117.0,2117.0,True,[],False,,0.0
+0xe65b1448e8e7bf9dc799945cf18c8394104b3537,tron,71.7,71.7,95.2,True,[],[],1874,1,1874.0,78.08,True,[],False,,0.0
+0xc93b59594d1800be4b4d80dfe6068229cae2af4b,tron,70.4,70.4,90.8,True,[],[],2166,1,2166.0,180.5,True,[],False,,0.0
+0xf8cd17784f425120de2f0d65756d8a707c13d040,ethereum,44.5,69.5,88.6,True,[],[],207,0,207.0,207.0,True,"['AE', 'GLOBAL', 'MT']",True,Binance 16,51793.173258
+0xd9fcd35ebcf3f404fcb4693deb325497636d947f,tron,67.9,67.9,94.2,True,[],[],440,0,440.0,440.0,True,[],False,,0.0
+0xd4b13bad3b585c1786a86c9527909fdb879f685c,tron,67.7,67.7,91.2,True,[],[],1342,1,1342.0,122.0,True,[],False,,0.0
+0x186b8b2ae81def818ccb8408861ce648595ae234,ethereum,67.7,67.7,91.0,True,[],[],615,0,615.0,615.0,True,[],False,,0.0
+0x9837ab290fb9b91951199da7b114fbbb4706d245,tron,67.5,67.5,95.5,True,[],[],1384,1,1384.0,62.91,True,[],False,,0.0
+0x970775693b164145e6ce9d092f97555cfe89e6f9,tron,65.5,65.5,93.2,True,[],[],1246,1,1246.0,207.67,True,[],False,,0.0
+0x92ea49b6e51de747f6cec1b4e07c78ce4bd72bc6,ethereum,39.6,64.6,87.7,True,[],[],259,1,259.0,10.79,True,"['AE', 'GLOBAL', 'MT']",True,Binance 14,20843.591382
+0x9f006a5328d2f5fd44bbb728168620ba60863a70,ethereum,63.1,63.1,84.7,True,[],[],570,0,570.0,570.0,True,[],False,,0.0
+0xd288dbf263e54c6950484d0190684f80b8d9d734,ethereum,37.8,62.8,72.4,True,[],[],91,1,91.0,91.0,True,"['AE', 'GLOBAL', 'MT']",True,Binance 16,30.0
+0x8fe0ed7219253ba556443eb7e798dc996704b5e0,ethereum,37.4,62.4,76.8,True,[],[],162,1,162.0,12.46,True,"['AE', 'GLOBAL', 'MT']",True,Binance 18,2066.5072
+0xd1fc584ed96ed22a10e26eeff3bd7da50f0e5978,tron,61.7,61.7,94.2,True,[],[],926,1,926.0,231.5,True,[],False,,0.0
+bc1qj9cu7kul0wvvxe4uuay05mwuewzdz0nv5v8hkl,bitcoin,60.2,60.2,100.0,True,[],[],3507,0,3507.0,146.12,True,[],False,,0.0
+0x8713173887299b893e17d98a473444cf19b28779,tron,59.5,59.5,95.1,True,[],[],636,1,636.0,636.0,True,[],False,,0.0
+bc1qlck5stwval5t0t4k2peerv757xalyvl3df4p8s,bitcoin,59.1,59.1,99.6,True,[],[],1290,0,1290.0,645.0,True,[],False,,0.0
+bc1qthg00j0p3tmp7ev3ut8535492lurc7g06ended,bitcoin,57.8,57.8,99.9,True,[],[],2812,0,2812.0,165.41,True,[],False,,0.0
+bc1qtfcnuueaxzpwylug8vl9w6aexfv8j8342ks4xz,bitcoin,56.9,56.9,99.8,True,[],[],2140,0,2140.0,267.5,True,[],False,,0.0
+bc1qwctfjys6g2aj5tftk9gf2emqe4kmjwqrqecd8s,bitcoin,56.1,56.1,99.9,True,[],[],2652,0,2652.0,884.0,True,[],False,,0.0
+bc1pt5zrlm55lmfwq7sjsuzgpgkmm7fymkna375l8kyuu5p6cq77545q554mgr,bitcoin,55.8,55.8,99.9,True,[],[],2592,0,2592.0,2592.0,True,[],False,,0.0
+0xb08c35956defc2b017478cf8001c16ad0cbe1f1b,tron,55.4,55.4,94.4,True,[],[],477,1,477.0,477.0,True,[],False,,0.0
+0x2b9962048a732264579bb837adc56779de2e8949,ethereum,29.7,54.7,83.5,True,[],[],177,1,177.0,9.83,True,"['AE', 'GLOBAL', 'MT']",True,Binance 14,15297.528575999999
+bc1q4tqadq8d5h8qn996f9apnr63qelezyxhcnjan5,bitcoin,54.1,54.1,100.0,True,[],[],4052,0,4052.0,4052.0,True,[],False,,0.0
+0x8358201b4339c47e29289093199b88576bd589e7,tron,54.1,54.1,94.4,True,[],[],563,1,563.0,563.0,True,[],False,,0.0
+bc1qfpk3v73mafh7ptz6q4nygjq4g5e6jud0mfw80s,bitcoin,53.9,53.9,99.7,True,[],[],1349,0,1349.0,1349.0,True,[],False,,0.0
+bc1q4r4hcqvw70r37m7wpf7597nmvc7c9zrsp9x5c5,bitcoin,53.7,53.7,100.0,True,[],[],4434,0,4434.0,4434.0,True,[],False,,0.0
+0x75e6766af534f83d9a9f6d8448cb735473b8aa4c,ethereum,28.6,53.6,75.0,True,[],[],92,1,92.0,4.38,True,"['AE', 'GLOBAL', 'MT']",True,Binance 16,4183.633361
+0x7bba792bccebb458ea8c42dcbfac3c66dcf561ec,tron,53.4,53.4,91.0,True,[],[],209,0,209.0,209.0,True,[],False,,0.0
+bc1qg4s6r2pm38hw5jezws85wcsd6np747at830lr3,bitcoin,52.7,52.7,99.9,True,[],[],3235,0,3235.0,808.75,True,[],False,,0.0
+0x2d3c7c3effff1dce08b8ac796e242f5f0c36ac47,ethereum,27.6,52.6,71.0,True,[],[],90,1,90.0,6.43,True,"['AE', 'GLOBAL', 'MT']",True,Binance 14,10745.990954999997
+bc1qpvsxc27np5tswzek6eevhflhnk8r2dm78wlwny,bitcoin,51.6,51.6,99.9,True,[],[],2680,0,2680.0,670.0,True,[],False,,0.0
+0x487445bc46ce5ba9918db8609a1928fbfa7382f4,ethereum,51.2,51.2,89.8,True,[],[],309,0,309.0,309.0,True,[],False,,0.0
+bc1q58m3vyvkmcpfvdxq9gsztuezjn4putvv4cv4a4,bitcoin,50.0,50.0,99.8,True,[],[],1648,0,1648.0,1648.0,True,[],False,,0.0
+bc1q9l3yeasfcqu9wq23vptmqx389e4t277zpel4zu,bitcoin,49.5,49.5,99.6,True,[],[],1296,0,1296.0,432.0,True,[],False,,0.0
+bc1q6zxlrcpz2ceecd5pvf8g4rt00pszf0qxpg92vd,bitcoin,48.9,48.9,99.7,True,[],[],1308,0,1308.0,218.0,True,[],False,,0.0
+bc1q4kuugektk3232wnwzn5dy2s7a65njdq2dsda67,bitcoin,48.7,48.7,99.8,True,[],[],2091,0,2091.0,2091.0,True,[],False,,0.0
+0xb3a7748172bd0c89eb89921aad88338c3519aae2,tron,48.5,48.5,93.4,True,[],[],371,1,371.0,371.0,True,[],False,,0.0
+0x88a4f1f15052a64bda4d9c0108bfe771f9e0d5bc,tron,48.4,48.4,92.2,True,[],[],508,1,508.0,101.6,True,[],False,,0.0
 bc1qwhclgrlkcthmv36ugcvjmp9et5dtu3tt4du4kk,bitcoin,46.8,46.8,99.6,True,[],[],1178,0,1178.0,1178.0,True,[],False,,0.0
-bc1qrmgzm369ym4mulwvgrp06xnjrnfj2hu7kgs0yk,bitcoin,46.1,46.1,99.8,True,[],[],1411,0,1411.0,1411.0,True,[],False,,0.0
-bc1qnkv55zpm302kl8w0xmxatxpkjqdultp0r5lw88,bitcoin,45.6,45.6,99.6,True,[],[],1084,0,1084.0,180.67,True,[],False,,0.0
-bc1q8rf5tn78m04geq24mm9j0d8cdmxhu27ncensq0,bitcoin,45.4,45.4,99.8,True,[],[],1640,0,1640.0,1640.0,True,[],False,,0.0
-0xf059439979be189009593b0d8e83bc6d880d609b,tron,44.8,44.8,94.3,True,[],[],470,1,470.0,78.33,True,[],False,,0.0
-0x22a4247ad0f3f30f8e2ded14a290071c78a29453,ethereum,44.6,44.6,71.0,True,[],[],978,3,326.0,42.52,False,[],False,,0.0
-bc1qvzjj6d9vfmpr0ewhwglsrehcnt0x350mu6mkrt,bitcoin,43.0,43.0,99.7,True,[],[],1361,0,1361.0,453.67,True,[],False,,0.0
-bc1qg4ltfdg8mc7f7uxkk5jufaklx8dur7qq44argy,bitcoin,42.6,42.6,99.7,True,[],[],1331,0,1331.0,1331.0,True,[],False,,0.0
-0xddfed0ea15221cb42c429e6cec9fb5d69b7a4163,tron,42.3,42.3,94.6,True,[],[],409,1,409.0,102.25,True,[],False,,0.0
-0x25fdad781a6903cad2c53e851ff4cdcbc0930810,tron,40.7,40.7,92.4,True,[],[],333,1,333.0,37.0,True,[],False,,0.0
-bc1qja094vwxw3j5udrqm99gxpqnjgka8nneu0c6cx,bitcoin,40.4,40.4,99.6,True,[],[],1063,0,1063.0,1063.0,True,[],False,,0.0
-0xdcd5c89b8c16187e5727297160c60a6472ff1ecc,tron,39.5,39.5,91.2,True,[],[],208,1,208.0,208.0,True,[],False,,0.0
-0x06798c9e490521a2958fc658293a1f89f5e2fbcf,ethereum,39.0,39.0,86.5,True,[],[],186,0,186.0,186.0,True,[],False,,0.0
-bc1q0z4zdq79vn36frnhp8gyt8j5xspwp27nq8n486,bitcoin,38.9,38.9,99.5,True,[],[],935,0,935.0,46.75,True,[],False,,0.0
-0x20fd6ec25a0506d72b674e2751dabb44558bce80,tron,38.9,38.9,91.7,True,[],[],296,1,296.0,42.29,True,[],False,,0.0
-bc1qd2x3hwgzw27spkuq9y3dvrumux4xt76njs4weu,bitcoin,38.7,38.7,99.5,True,[],[],881,0,881.0,881.0,True,[],False,,0.0
-0xa9a78b0e26070224888873166429ae6b4505aa31,tron,37.4,37.4,92.3,True,[],[],323,1,323.0,46.14,True,[],False,,0.0
-0x5a9f2f8f0508e2ac7bcfe6f3ef2e822c852ce48f,ethereum,36.5,36.5,80.8,True,[],[],159,0,159.0,159.0,True,[],False,,0.0
-0xe0f9ee725be0b5b5ba8d33fb87377f08d7bb97c4,ethereum,36.4,36.4,76.3,True,[],[],147,0,147.0,147.0,True,[],False,,0.0
-0xc3a35428de74e7981055e26c3a4163d383a9c9d1,ethereum,36.4,36.4,82.1,True,[],[],136,0,136.0,136.0,True,[],False,,0.0
-0x807926ee5a7425ef21f04f2791b0c1cb5ded7d28,tron,36.0,36.0,91.7,True,[],[],329,1,329.0,29.91,True,[],False,,0.0
-0xe37c9d39ae8f819ba0077d51bf4f62a6fbd0f6a0,ethereum,35.8,35.8,74.5,True,[],[],114,0,114.0,114.0,True,[],False,,0.0
-0x66306e09fe5553ea21bc10d5cb3a5cf25960c6d6,tron,35.1,35.1,92.0,True,[],[],307,1,307.0,30.7,True,[],False,,0.0
-0x45462a36ad9ecf4dbc0918ea3774e1a70c8eaf4a,tron,34.9,34.9,91.3,True,[],[],249,1,249.0,249.0,True,[],False,,0.0
-0xbf3dd82d75d0a70a9388eb369d4b774232a1ead9,ethereum,32.7,32.7,72.6,True,[],[],102,1,102.0,4.08,True,[],False,,0.0
-0x00f503370b6cfd14a742427e79b2859bd8d86df9,ethereum,32.2,32.2,78.9,True,[],[],129,0,129.0,129.0,True,[],False,,0.0
-0xa7a3da44ccf09ce44bd8845c1c7c90ba7c4edcd6,ethereum,31.1,31.1,79.8,True,[],[],213,1,213.0,53.25,True,[],False,,0.0
-0xd35e0895c5551b48fc2a84f7614542757d34c0b6,ethereum,30.1,30.1,73.5,True,[],[],126,0,126.0,126.0,True,[],False,,0.0
-0x2e6536e372cb2c6c5329c349d61cffdc0b89a15b,tron,28.9,28.9,91.1,True,[],[],233,1,233.0,116.5,True,[],False,,0.0
-0x5a5d922bee066cc594e307b0c19c1972bef40088,ethereum,28.6,28.6,70.8,True,[],[],120,0,120.0,120.0,True,[],False,,0.0
-0xe9bf83e1883f9ed6a875d9e03a1da444e5871099,tron,27.3,27.3,90.7,True,[],[],173,1,173.0,17.3,True,[],False,,0.0
-0x9090bd330e88984d1aae8759a7e7395bea0f598a,ethereum,25.6,25.6,73.7,True,[],[],85,1,85.0,85.0,True,[],False,,0.0
+0xeb187b6b15120eb3a6b09a0b73c6cd83ddb2c064,ethereum,46.3,46.3,91.1,True,[],[],320,1,320.0,320.0,True,[],False,,0.0
+bc1q8rf5tn78m04geq24mm9j0d8cdmxhu27ncensq0,bitcoin,46.1,46.1,99.8,True,[],[],1654,0,1654.0,1654.0,True,[],False,,0.0
+bc1qrmgzm369ym4mulwvgrp06xnjrnfj2hu7kgs0yk,bitcoin,45.5,45.5,99.8,True,[],[],1426,0,1426.0,1426.0,True,[],False,,0.0
+0x96e74e1cd5edecfc7f90372b024e092d2b2eb644,tron,45.0,45.0,91.0,True,[],[],409,1,409.0,409.0,True,[],False,,0.0
+0x22a4247ad0f3f30f8e2ded14a290071c78a29453,ethereum,44.7,44.7,71.0,True,[],[],977,3,325.67,42.48,False,[],False,,0.0
+0xf059439979be189009593b0d8e83bc6d880d609b,tron,44.5,44.5,94.3,True,[],[],476,1,476.0,79.33,True,[],False,,0.0
+bc1qnkv55zpm302kl8w0xmxatxpkjqdultp0r5lw88,bitcoin,44.2,44.2,99.6,True,[],[],1089,0,1089.0,181.5,True,[],False,,0.0
+bc1qvzjj6d9vfmpr0ewhwglsrehcnt0x350mu6mkrt,bitcoin,43.7,43.7,99.7,True,[],[],1335,0,1335.0,445.0,True,[],False,,0.0
+bc1qg4ltfdg8mc7f7uxkk5jufaklx8dur7qq44argy,bitcoin,43.2,43.2,99.7,True,[],[],1351,0,1351.0,1351.0,True,[],False,,0.0
+0xdcd5c89b8c16187e5727297160c60a6472ff1ecc,tron,40.3,40.3,91.3,True,[],[],211,1,211.0,211.0,True,[],False,,0.0
+0xddfed0ea15221cb42c429e6cec9fb5d69b7a4163,tron,39.6,39.6,94.6,True,[],[],409,1,409.0,102.25,True,[],False,,0.0
+bc1qja094vwxw3j5udrqm99gxpqnjgka8nneu0c6cx,bitcoin,39.5,39.5,99.6,True,[],[],1042,0,1042.0,1042.0,True,[],False,,0.0
+0x20fd6ec25a0506d72b674e2751dabb44558bce80,tron,39.5,39.5,91.7,True,[],[],297,1,297.0,42.43,True,[],False,,0.0
+0x06798c9e490521a2958fc658293a1f89f5e2fbcf,ethereum,38.4,38.4,86.4,True,[],[],186,0,186.0,186.0,True,[],False,,0.0
+bc1q0z4zdq79vn36frnhp8gyt8j5xspwp27nq8n486,bitcoin,37.9,37.9,99.5,True,[],[],950,0,950.0,47.5,True,[],False,,0.0
+0x25fdad781a6903cad2c53e851ff4cdcbc0930810,tron,37.4,37.4,92.4,True,[],[],333,1,333.0,37.0,True,[],False,,0.0
+0xe0f9ee725be0b5b5ba8d33fb87377f08d7bb97c4,ethereum,37.3,37.3,76.4,True,[],[],147,0,147.0,147.0,True,[],False,,0.0
+bc1qd2x3hwgzw27spkuq9y3dvrumux4xt76njs4weu,bitcoin,37.2,37.2,99.5,True,[],[],881,0,881.0,881.0,True,[],False,,0.0
+bc1qzcxms4hv78khfy0t88s2sxwxg56ycrmtfdre4p,bitcoin,36.9,36.9,99.5,True,[],[],883,0,883.0,883.0,True,[],False,,0.0
+0x5a9f2f8f0508e2ac7bcfe6f3ef2e822c852ce48f,ethereum,36.4,36.4,80.9,True,[],[],159,0,159.0,159.0,True,[],False,,0.0
+0xc3a35428de74e7981055e26c3a4163d383a9c9d1,ethereum,36.0,36.0,82.1,True,[],[],136,0,136.0,136.0,True,[],False,,0.0
+0xa9a78b0e26070224888873166429ae6b4505aa31,tron,35.5,35.5,92.2,True,[],[],321,1,321.0,45.86,True,[],False,,0.0
+0x45462a36ad9ecf4dbc0918ea3774e1a70c8eaf4a,tron,35.5,35.5,91.3,True,[],[],248,1,248.0,248.0,True,[],False,,0.0
+0xe37c9d39ae8f819ba0077d51bf4f62a6fbd0f6a0,ethereum,35.5,35.5,74.6,True,[],[],114,0,114.0,114.0,True,[],False,,0.0
+0x807926ee5a7425ef21f04f2791b0c1cb5ded7d28,tron,34.2,34.2,92.4,True,[],[],328,1,328.0,32.8,True,[],False,,0.0
+0xbb9d7c10e31d90fcde02bbdf34a8b77116d5522f,tron,33.7,33.7,90.7,True,[],[],254,1,254.0,84.67,True,[],False,,0.0
+0x66306e09fe5553ea21bc10d5cb3a5cf25960c6d6,tron,33.0,33.0,92.1,True,[],[],307,1,307.0,30.7,True,[],False,,0.0
+0x00f503370b6cfd14a742427e79b2859bd8d86df9,ethereum,31.9,31.9,79.0,True,[],[],129,0,129.0,129.0,True,[],False,,0.0
+0xa7a3da44ccf09ce44bd8845c1c7c90ba7c4edcd6,ethereum,30.7,30.7,79.8,True,[],[],213,1,213.0,53.25,True,[],False,,0.0
+0xbf3dd82d75d0a70a9388eb369d4b774232a1ead9,ethereum,30.7,30.7,72.8,True,[],[],102,1,102.0,4.08,True,[],False,,0.0
+0xd35e0895c5551b48fc2a84f7614542757d34c0b6,ethereum,29.9,29.9,73.5,True,[],[],126,0,126.0,126.0,True,[],False,,0.0
+0x2e6536e372cb2c6c5329c349d61cffdc0b89a15b,tron,28.5,28.5,91.2,True,[],[],235,1,235.0,117.5,True,[],False,,0.0
+0x5a5d922bee066cc594e307b0c19c1972bef40088,ethereum,28.4,28.4,70.9,True,[],[],120,0,120.0,120.0,True,[],False,,0.0
+0x9090bd330e88984d1aae8759a7e7395bea0f598a,ethereum,25.7,25.7,73.8,True,[],[],85,1,85.0,85.0,True,[],False,,0.0
