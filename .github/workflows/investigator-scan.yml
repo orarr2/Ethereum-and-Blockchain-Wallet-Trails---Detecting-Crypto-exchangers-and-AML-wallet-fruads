@@ -19,6 +19,13 @@ on:
     # Cloud Scheduler; this cron is just a backup in case Scheduler fails.
     - cron: "0 9 * * *"    # 09:00 UTC = 12:00 IDT / 11:00 IST
   workflow_dispatch:        # manual "Run workflow" button + Cloud Scheduler target
+  workflow_run:
+    # Chain: when the daily refresh finishes (fresh master.csv committed),
+    # fire the scan automatically so the digest / PDF / CSV land minutes
+    # later - without needing a second Cloud Scheduler job.
+    workflows: ["Investigator daily BQ refresh"]
+    types: [completed]
+    branches: [main]
     inputs:
       top_k:
         description: "Dossiers per chain"

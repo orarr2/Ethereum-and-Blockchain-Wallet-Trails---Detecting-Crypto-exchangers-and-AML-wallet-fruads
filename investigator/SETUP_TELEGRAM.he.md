@@ -6,7 +6,7 @@
 ## איך זה עובד
 
 ```
-GitHub Actions (cron, פעם ביום ב-12:00, רץ גם כשהמחשב כבוי)
+Cloud Scheduler (פעם ביום ב-11:30 IL) → refresh → chain אוטומטי ל-scan → דוח ~11:45
    └─ run_nightly  : rerank של ה-master → top-K → דוסיירים
    └─ publish_site : דוסיירים → GitHub Pages (אתר)
    └─ notify       : digest → בוט טלגרם → 📱 התראה בטלפון (עם לינק לדוסייר)
@@ -63,7 +63,7 @@ GitHub Actions (cron, פעם ביום ב-12:00, רץ גם כשהמחשב כבו�
 התראה בטלגרם, והדוסיירים יעלו לאתר ה-Pages
 (`https://<שם-המשתמש>.github.io/<שם-הריפו>/`).
 
-מכאן זה אוטומטי: פעם ביום ב-**12:00 בישראל** (09:00 UTC).
+מכאן זה אוטומטי: פעם ביום, refresh ב-**11:30 בישראל** מייצר master חדש, scan מתחבר אוטומטית כשה-refresh מסיים ושולח את הדוח סביב **11:45 בישראל**.
 
 ---
 
@@ -115,11 +115,12 @@ $env:TELEGRAM_BOT_TOKEN='...'; $env:TELEGRAM_CHAT_ID='...'; python -m investigat
 
 ## סריקה יומית אוטומטית (Refresh workflow)
 
-Workflow שלישי - `investigator-refresh.yml` - רץ **פעם ביום ב-10:00 בישראל
-(07:00 UTC)**, מריץ את המחברת מקצה לקצה על BigQuery, מגלה ארנקים חדשים, וכותב
-`master.csv` מעודכן חזרה ל-main עם `[skip ci]` כדי לא להפעיל אוטומטית סריקה
-מיותרת. שעתיים אחר כך (12:00 בישראל) - ה-cron של ה-scan קורא את ה-master
-החדש ושולח לך את ה-PDF+CSV המעודכנים.
+Workflow שלישי - `investigator-refresh.yml` - רץ **פעם ביום ב-11:30 בישראל**
+(מופעל על ידי Cloud Scheduler, ראה למטה), מריץ את המחברת מקצה לקצה על
+BigQuery, מגלה ארנקים חדשים, וכותב `master.csv` מעודכן חזרה ל-main עם
+`[skip ci]` כדי לא להפעיל אוטומטית סריקה מיותרת. **כשה-refresh מסיים,
+workflow ה-scan מופעל אוטומטית** (דרך `workflow_run` trigger) וקורא את
+ה-master החדש ושולח את ה-PDF+CSV לטלגרם, בדרך כלל סביב 11:45 IL.
 
 ### מה שצריך להגדיר פעם אחת (חד-פעמי)
 
