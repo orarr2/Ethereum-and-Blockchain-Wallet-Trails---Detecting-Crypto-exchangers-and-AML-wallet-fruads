@@ -1,22 +1,24 @@
 name: Investigator scan
 
-# Autonomous twice-daily scan that runs even when your PC is off.
+# Autonomous daily scan that runs even when your PC is off.
 # It re-ranks the committed master table, writes dossiers, publishes them to
 # GitHub Pages, and pushes a digest to your phone via a Telegram bot.
 #
 # Works with ZERO secrets (degrades to the offline `mock` provider and a
 # dry-run notify). Add secrets/variables to make it real - see investigator/README.md.
+#
+# NOTE: Real scheduling comes from an external Cloud Scheduler job
+# (workflow_dispatch via GitHub API) which fires reliably at 12:00 Israel time
+# regardless of GitHub's internal scheduler throttling. The GitHub cron below
+# is only a best-effort backup that GitHub may or may not honor.
 
 on:
   schedule:
-    # GitHub Actions cron is UTC only (no tz support). Israel = UTC+3 in
-    # summer (IDT) / UTC+2 in winter (IST). These offsets target IDT so the
-    # push arrives at 12:00 and 20:00 Israel time in summer. In winter the
-    # arrival shifts one hour earlier (11:00 and 19:00 IST) - adjust the
-    # hours below if you want winter to be exact instead.
+    # GitHub Actions cron is UTC only (no tz support). 09:00 UTC targets
+    # 12:00 IDT (summer) / 11:00 IST (winter). Real timing is enforced by
+    # Cloud Scheduler; this cron is just a backup in case Scheduler fails.
     - cron: "0 9 * * *"    # 09:00 UTC = 12:00 IDT / 11:00 IST
-    - cron: "0 17 * * *"   # 17:00 UTC = 20:00 IDT / 19:00 IST
-  workflow_dispatch:        # manual "Run workflow" button
+  workflow_dispatch:        # manual "Run workflow" button + Cloud Scheduler target
     inputs:
       top_k:
         description: "Dossiers per chain"

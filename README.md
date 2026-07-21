@@ -149,7 +149,7 @@ running when the researcher's laptop is closed. The base project is untouched; t
   Every claim in a dossier anchors to a `[TOOL:n]` observation in the reasoning trace.
 - **Adaptive triage** - an online LinUCB reranker fed by analyst verdicts, warm-started weekly by an
   XGBoost pairwise LTR pass. Feature flag off -> queue stays on the static `actionability` order.
-- **Autonomous delivery** - a GitHub Actions cron scan (twice a day) writes dossiers, publishes them to
+- **Autonomous delivery** - a daily scan at 12:00 Israel time writes dossiers, publishes them to
   **GitHub Pages**, and pushes a digest to a **Telegram bot**. Runs with zero secrets on committed
   data; add secrets to turn it into a live BigQuery + LLM run. Detailed setup in Hebrew:
   [`investigator/SETUP_TELEGRAM.he.md`](investigator/SETUP_TELEGRAM.he.md).

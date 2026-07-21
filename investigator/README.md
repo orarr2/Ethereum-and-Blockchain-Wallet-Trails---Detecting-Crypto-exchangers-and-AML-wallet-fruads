@@ -133,7 +133,7 @@ GitHub Actions (cron 2x/day) -> run_nightly -> publish_site -> GitHub Pages
      variable `INVESTIGATOR_LLM_PROVIDER=anthropic`.
 3. **GitHub repo -> Settings -> Pages -> Source: GitHub Actions.**
 4. Push, then **Actions -> Investigator scan -> Run workflow** to test now (or
-   wait for the 06:00 / 18:00 UTC cron).
+   wait for the daily 09:00 UTC / 12:00 Israel scan).
 
 Change the cadence in `.github/workflows/investigator-scan.yml` (the two `cron`
 lines). Other channels are built in: set repo variable `NOTIFY_CHANNEL=email`
