@@ -7,22 +7,17 @@ name: Investigator scan
 # Works with ZERO secrets (degrades to the offline `mock` provider and a
 # dry-run notify). Add secrets/variables to make it real - see investigator/README.md.
 #
-# NOTE: Real scheduling comes from an external Cloud Scheduler job
-# (workflow_dispatch via GitHub API) which fires reliably at 12:00 Israel time
-# regardless of GitHub's internal scheduler throttling. The GitHub cron below
-# is only a best-effort backup that GitHub may or may not honor.
+# NOTE: The scan runs ONLY when the daily refresh finishes (workflow_run chain
+# below) or when manually triggered. NO GitHub cron here - a separate schedule
+# would fire in parallel with the workflow_run chain and produce duplicate
+# reports for the same master.csv (observed 2-3x/day noise before this change).
 
 on:
-  schedule:
-    # GitHub Actions cron is UTC only (no tz support). 09:00 UTC targets
-    # 12:00 IDT (summer) / 11:00 IST (winter). Real timing is enforced by
-    # Cloud Scheduler; this cron is just a backup in case Scheduler fails.
-    - cron: "0 9 * * *"    # 09:00 UTC = 12:00 IDT / 11:00 IST
-  workflow_dispatch:        # manual "Run workflow" button + Cloud Scheduler target
+  workflow_dispatch:        # manual "Run workflow" button
   workflow_run:
     # Chain: when the daily refresh finishes (fresh master.csv committed),
     # fire the scan automatically so the digest / PDF / CSV land minutes
-    # later - without needing a second Cloud Scheduler job.
+    # later - this is the SOLE automatic trigger.
     workflows: ["Investigator daily BQ refresh"]
     types: [completed]
     branches: [main]

@@ -16,8 +16,9 @@ name: Investigator daily BQ refresh
 #    project (steps in investigator/SETUP_TELEGRAM.he.md).
 
 on:
-  schedule:
-    - cron: "0 7 * * *"   # 07:00 UTC = 10:00 IDT (2h before the 12:00 IL scan)
+  # NO GitHub schedule - Cloud Scheduler is the sole authoritative trigger
+  # (fires workflow_dispatch at 11:30 IL). A GitHub cron here would fire in
+  # parallel and burn a second BigQuery scan per day.
   workflow_dispatch:
     inputs:
       kill_usd:

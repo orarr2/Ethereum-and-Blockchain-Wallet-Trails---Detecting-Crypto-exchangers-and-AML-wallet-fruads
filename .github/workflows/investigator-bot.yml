@@ -15,9 +15,15 @@ name: Investigator bot poll
 
 on:
   schedule:
-    - cron: "*/10 * * * *"    # `*/10` is honored more reliably than `*/5`
+    # Every 30 min instead of every 10 min. GitHub honors `0,30 * * * *` far
+    # more reliably than `*/10` on public repos, and combined with the 25-min
+    # loop below the bot listens ~50 min out of every 60 (vs. ~15 min before)
+    # while cutting the total workflow-run count by ~3x.
+    - cron: "0,30 * * * *"
   workflow_dispatch:
   workflow_run:
+    # Fires the bot right after every scan / refresh, so any command that
+    # arrives during the data cycle gets a fresh listener within seconds.
     workflows: ["Investigator scan", "Investigator daily BQ refresh"]
     types: [completed]
 
@@ -34,12 +40,12 @@ concurrency:
 jobs:
   poll:
     runs-on: ubuntu-latest
-    timeout-minutes: 15   # loop is ~9 min; 15 min gives room for install + slack
+    timeout-minutes: 30   # loop is 25 min; 30 min gives room for install + slack
     env:
       TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
       TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
       INVESTIGATOR_SITE_URL: ${{ vars.INVESTIGATOR_SITE_URL }}
-      BOT_LOOP_SECONDS: "540"        # 9 minutes of long polling per run
+      BOT_LOOP_SECONDS: "1500"       # 25 minutes of long polling per run
       BOT_LONG_POLL_SECONDS: "25"    # each getUpdates blocks up to 25s
     steps:
       - uses: actions/checkout@v4
